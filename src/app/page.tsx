@@ -1,3 +1,4 @@
+import Hero from "@/components/Hero"
 import { getUserFromToken } from "@/hooks/getUser"
 
 export default async function Home() {
@@ -11,15 +12,8 @@ export default async function Home() {
   }
 
   return (
-    <div className="container">
-      {error ? (
-        <div>{error}</div>
-      ) : (
-        <div>
-          <h1>Welcome {user?.username}</h1>
-          <p>Email: {user?.email}</p>
-        </div>
-      )}
+    <div className="">
+      <Hero user={user} />
     </div>
   )
 }

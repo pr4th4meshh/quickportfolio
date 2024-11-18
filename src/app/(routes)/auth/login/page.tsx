@@ -3,11 +3,14 @@ import { FormFields, LoginFields, LoginSchemaFrontend } from '@/lib/zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
 
 const Login = () => {
   const { handleSubmit, setError,reset, register, formState: { errors, isSubmitting } } = useForm<FormFields>({
     resolver: zodResolver(LoginSchemaFrontend)
   })
+
+  const router = useRouter()
 
   const handleOnSubmit = async (data: LoginFields) => {
     try {
@@ -27,6 +30,7 @@ const Login = () => {
         reset()
         alert("User logged in successfully")
       }
+      router.push("/")
     } catch (error) {
       console.error(error)
       alert(error.message || 'An error occurred')
