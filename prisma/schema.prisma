@@ -14,8 +14,35 @@ datasource db {
 }
 
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  email String @unique
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
   username String
   password String
+
+  Portfolio Portfolio[]
+}
+
+model Portfolio {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  username   String
+  fullName   String
+  profession String
+  headline   String?
+  theme      String    @default("modern-minimal")
+  features   String[]
+  projects   Project[]
+  userId     String    @db.ObjectId
+  User       User      @relation(fields: [userId], references: [id])
+}
+
+model Project {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  link        String?
+  timeline    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  portfolioId String    @db.ObjectId
+  Portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
 }
