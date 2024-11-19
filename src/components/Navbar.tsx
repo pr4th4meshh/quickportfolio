@@ -3,6 +3,7 @@ import DarkModeToggle from "./DarkModeToggle"
 import PrimaryButton from "./ui/primary-button"
 import Image from "next/image"
 import TempProfilePicture from "../../public/vercel.svg"
+import ThemeSwitch from "./ui/ThemeSwitch"
 
 interface User {
   id: string
@@ -14,11 +15,12 @@ const Navbar = ({ user }: { user: User }) => {
     <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6 shadow-md">
       <div className="flex items-center justify-between mx-auto w-min sm:w-[30vw] border-gray-400 border-2 py-4 sm:py-4 px-6 sm:px-8 rounded-full space-x-6">
         <div>
-        <h1 className="text-white text-xl font-semibold">qPortfolio</h1>
+        <h1 className="text-black dark:text-white text-xl font-semibold">qPortfolio</h1>
 
         </div>
        <div className="flex flex-row">
-       <DarkModeToggle />
+       {/* <DarkModeToggle /> */}
+       <ThemeSwitch />
         {user ? (
           <div className="flex items-center space-x-3 ml-3">
             <div className="hidden sm:flex items-center space-x-2">
@@ -37,7 +39,7 @@ const Navbar = ({ user }: { user: User }) => {
             
           </div>
         ) : (
-          <PrimaryButton title="Login" onClick={() => alert("Login")} />
+          <PrimaryButton className="dark:bg-white bg-black dark:text-black text-white dark:disabled:bg-gray-400 disabled:bg-gray-200" title="Login" onClick={() => alert("Login")} />
         )}
        </div>
       </div>
