@@ -6,19 +6,25 @@ const PrimaryButton = ({
   onClick,
   icon,
   className,
+  disabled,
+  type
 }: {
   title: string
-  onClick: () => void
+  onClick?: () => void
   className?: string
   icon?: React.ReactNode
+  disabled?: boolean
+  type?: "button" | "submit" | "reset"
 }) => {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "px-4 py-2 rounded-full border border-neutral-600 text-black bg-white hover:bg-gray-100 transition duration-200 flex justify-center items-center",
+        "px-4 py-2 rounded-full border border-neutral-600 text-black bg-white transition duration-200 flex justify-center items-center",
         className
       )}
+      disabled={disabled}
+      type={type}
     >
       {icon}
       {title}

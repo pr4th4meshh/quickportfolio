@@ -1,5 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 import React, { useEffect, useRef, useState } from "react";
 import { createNoise3D } from "simplex-noise";
 
@@ -9,7 +10,6 @@ export const WavyBackground = ({
   containerClassName,
   colors,
   waveWidth,
-  backgroundFill,
   blur = 10,
   speed = "fast",
   waveOpacity = 0.5,
@@ -20,12 +20,12 @@ export const WavyBackground = ({
   containerClassName?: string;
   colors?: string[];
   waveWidth?: number;
-  backgroundFill?: string;
   blur?: number;
   speed?: "slow" | "fast";
   waveOpacity?: number;
   [key: string]: any;
 }) => {
+  const { resolvedTheme } = useTheme();
   const noise = createNoise3D();
   let w: number,
     h: number,
@@ -35,6 +35,7 @@ export const WavyBackground = ({
     ctx: any,
     canvas: any;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
   const getSpeed = () => {
     switch (speed) {
       case "slow":
@@ -68,6 +69,7 @@ export const WavyBackground = ({
     "#6B6B6B",
     "#151515",
   ];
+
   const drawWave = (n: number) => {
     nt += getSpeed();
     for (i = 0; i < n; i++) {
@@ -84,8 +86,10 @@ export const WavyBackground = ({
   };
 
   let animationId: number;
+
   const render = () => {
-    ctx.fillStyle = backgroundFill || "black";
+    const bgColor = resolvedTheme === "dark" ? "#000" : "#e6e6e6"; 
+    ctx.fillStyle = bgColor;
     ctx.globalAlpha = waveOpacity || 0.5;
     ctx.fillRect(0, 0, w, h);
     drawWave(5);
@@ -97,11 +101,11 @@ export const WavyBackground = ({
     return () => {
       cancelAnimationFrame(animationId);
     };
-  }, []);
+  }, [resolvedTheme]); 
 
   const [isSafari, setIsSafari] = useState(false);
   useEffect(() => {
-    // I'm sorry but i have got to support it on safari.
+    // Safari-specific workaround
     setIsSafari(
       typeof window !== "undefined" &&
         navigator.userAgent.includes("Safari") &&

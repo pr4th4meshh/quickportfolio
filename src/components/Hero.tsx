@@ -7,6 +7,7 @@ import { IoLogoGithub, IoLogoLinkedin, IoLogoTwitter } from "react-icons/io"
 import { FloatingDock } from "./ui/floating-dock"
 import { IoLogoInstagram } from "react-icons/io5"
 import { FaUpwork } from "react-icons/fa6"
+import { useRouter } from "next/navigation"
 
 interface User {
   id: string
@@ -15,6 +16,7 @@ interface User {
 }
 
 export default function Hero({ user }: { user: User }) {
+  const router = useRouter()
   const words = ["easy", "quick", "beautiful", "modern"]
   const links = [
     {
@@ -55,14 +57,13 @@ export default function Hero({ user }: { user: User }) {
   ]
   return (
     <WavyBackground>
-      <div>
         <Navbar user={user} />
         <div className="min-h-screen flex flex-col items-center justify-center">
           <div className="flex flex-col justify-center text-center px-4">
             <h1 className="text-5xl sm:text-7xl text-center font-bold text-gray-900 dark:text-white my-10">
               No Portfolio? No Problem!
             </h1>
-            <div className="text-4xl sm:text-6xl font-normal text-center sm:text-start text-neutral-600 dark:text-neutral-400">
+            <div className="text-4xl sm:text-6xl font-normal text-center sm:text-start text-white dark:text-neutral-400">
               Build
               <FlipWords className="text-white" words={words} /> <br />
               portfolio site with just a few clicks
@@ -70,7 +71,7 @@ export default function Hero({ user }: { user: User }) {
 
             <BorderStyleButton
               title="Create your qPortfolio"
-              onClick={() => alert("Create your qPortfolio")}
+              onClick={() => router.push("/onboarding")}
               className="mt-20 w-[300px] flex self-center text-2xl items-center"
             />
           </div>
@@ -80,7 +81,6 @@ export default function Hero({ user }: { user: User }) {
             items={links}
           />
         </div>
-      </div>
     </WavyBackground>
   )
 }
