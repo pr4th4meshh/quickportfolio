@@ -2,8 +2,9 @@ import prisma from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import bcrypt from "bcrypt"
 import { SignupSchema } from "@/lib/zod"
+import { useAuth } from "@clerk/nextjs"
 
-export async function POST(req: Request) {
+export async function POST(req: Request) {  
   const body = await req.json()
   const bodyResult = SignupSchema.safeParse(body)
 

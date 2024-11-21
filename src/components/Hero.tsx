@@ -8,6 +8,7 @@ import { FloatingDock } from "./ui/floating-dock"
 import { IoLogoInstagram } from "react-icons/io5"
 import { FaUpwork } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 interface User {
   id: string
@@ -15,7 +16,7 @@ interface User {
   email: string
 }
 
-export default function Hero({ user }: { user: User }) {
+export default function Hero() {
   const router = useRouter()
   const words = ["easy", "quick", "beautiful", "modern"]
   const links = [
@@ -55,9 +56,12 @@ export default function Hero({ user }: { user: User }) {
       href: "#",
     },
   ]
+
+  const user = useSession()
+  console.log(user, "user via nextauth")
   return (
     <WavyBackground>
-        <Navbar user={user} />
+        <Navbar />
         <div className="min-h-screen flex flex-col items-center justify-center">
           <div className="flex flex-col justify-center text-center px-4">
             <h1 className="text-5xl sm:text-7xl text-center font-bold text-gray-900 dark:text-white my-10">

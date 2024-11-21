@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { useAuth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 interface IProject {

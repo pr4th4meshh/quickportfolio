@@ -1,17 +1,26 @@
-import React from "react"
-import DarkModeToggle from "./DarkModeToggle"
-import PrimaryButton from "./ui/primary-button"
-import Image from "next/image"
-import TempProfilePicture from "../../public/vercel.svg"
-import ThemeSwitch from "./ui/ThemeSwitch"
-// import { LoginLink, LogoutLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs"
+"use client"
+import React from "react";
+import DarkModeToggle from "./DarkModeToggle";
+import PrimaryButton from "./ui/primary-button";
+import Image from "next/image";
+import TempProfilePicture from "../../public/vercel.svg";
+import ThemeSwitch from "./ui/ThemeSwitch";
+import { signIn } from "next-auth/react";
 
 interface User {
-  id: string
-  username: string
+  id: string;
+  username: string;
 }
 
-const Navbar = ({ user }: { user: User }) => {
+const Navbar = () => {
+  const user = {
+    username: "prathamesh",
+  };
+
+  const handleSignIn = () => {
+    signIn("google");
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6 shadow-md">
       <div className="flex items-center justify-between mx-auto w-min sm:w-[30vw] border-gray-400 border-2 py-4 sm:py-4 px-6 sm:px-8 rounded-full space-x-6">
@@ -19,12 +28,10 @@ const Navbar = ({ user }: { user: User }) => {
           <h1 className="text-black dark:text-white text-xl font-semibold">
             qPortfolio
           </h1>
+          <button onClick={handleSignIn}>Signin with Google</button>
         </div>
         <div className="flex flex-row">
-          {/* <DarkModeToggle /> */}
           <ThemeSwitch />
-          {/* <LoginLink> Login with Kinde </LoginLink>
-          <RegisterLink> Register with Kinde </RegisterLink> */}
           {user ? (
             <div className="flex items-center space-x-3 ml-3">
               <div className="hidden sm:flex items-center space-x-2">
@@ -41,7 +48,6 @@ const Navbar = ({ user }: { user: User }) => {
                     user?.username?.slice(1)}
                 </span>
               </div>
-              {/* <LogoutLink >Logout Kinde</LogoutLink> */}
               <PrimaryButton
                 className="font-medium"
                 title="Logout"
@@ -52,13 +58,13 @@ const Navbar = ({ user }: { user: User }) => {
             <PrimaryButton
               className="dark:bg-white bg-black dark:text-black text-white dark:disabled:bg-gray-400 disabled:bg-gray-200"
               title="Login"
-              onClick={() => alert("Login")}
+              onClick={handleSignIn}
             />
           )}
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

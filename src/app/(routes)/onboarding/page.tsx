@@ -6,11 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import {
   FaChevronRight,
-  FaSpinner,
   FaPalette,
   FaChartBar,
   FaBook,
-  FaMagic,
+  FaMagic
 } from "react-icons/fa"
 import { WavyBackground } from "@/components/ui/wavy-background"
 import PrimaryButton from "@/components/ui/primary-button"
@@ -403,91 +402,6 @@ export default function OnboardingForm() {
                 </div>
               </div>
             )}
-
-            {/* {step === 4 && (
-              <div>
-                <div className="space-y-2">
-                  <label
-                    htmlFor="projectTitle"
-                    className="block text-sm font-medium"
-                  >
-                    Project Title
-                  </label>
-                  <input
-                    id="projectTitle"
-                    placeholder="Project Title"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    {...register("projectTitle")}
-                  />
-                  {errors.projectTitle && (
-                    <p className="text-sm text-red-500">
-                      {errors.projectTitle.message}
-                    </p>
-                  )}
-                  <label
-                    htmlFor="projectLink"
-                    className="block text-sm font-medium"
-                  >
-                    Project Link
-                  </label>
-                  <input
-                    id="projectLink"
-                    placeholder="https://yourproject.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    {...register("projectLink")}
-                  />
-                  {errors.projectLink && (
-                    <p className="text-sm text-red-500">
-                      {errors.projectLink.message}
-                    </p>
-                  )}
-                  <label
-                    htmlFor="projectDescription"
-                    className="block text-sm font-medium"
-                  >
-                    Project Description
-                  </label>
-                  <div className="flex space-x-2">
-                    <textarea
-                      id="projectDescription"
-                      placeholder="Describe your project"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      {...register("projectDescription")}
-                    />
-                    <button
-                      type="button"
-                      className="px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-black dark:text-white text-black hover:bg-gray-200 focus:outline-none"
-                      onClick={() => generateAIContent("projectDescription")}
-                      disabled={isLoading}
-                    >
-                      <FaMagic className="w-4 h-4" />
-                    </button>
-                  </div>
-                  {errors.projectDescription && (
-                    <p className="text-sm text-red-500">
-                      {errors.projectDescription.message}
-                    </p>
-                  )}
-                  <label
-                    htmlFor="projectTimeline"
-                    className="block text-sm font-medium"
-                  >
-                    Project Timeline
-                  </label>
-                  <input
-                    id="projectTimeline"
-                    type="date"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    {...register("projectTimeline")}
-                  />
-                  {errors.projectTimeline && (
-                    <p className="text-sm text-red-500">
-                      {errors.projectTimeline.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )} */}
 
             {step === 4 && (
               <div className="space-y-4">

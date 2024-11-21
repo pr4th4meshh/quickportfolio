@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import localFont from "next/font/local"
 import "./globals.css"
-import { Providers } from "./providers"
+import { NextAuthSessionProvider, Providers } from "./providers"
 
 const poppins = localFont({
   src: [
@@ -25,10 +25,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} antialiased`}>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
+    <NextAuthSessionProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${poppins.variable} antialiased`}>
+          <Providers>{children}</Providers>
+        </body>
+      </html>
+    </NextAuthSessionProvider>
   )
 }
