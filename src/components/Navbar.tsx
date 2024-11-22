@@ -5,7 +5,8 @@ import PrimaryButton from "./ui/primary-button";
 import Image from "next/image";
 import TempProfilePicture from "../../public/vercel.svg";
 import ThemeSwitch from "./ui/ThemeSwitch";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import SigninWGoogle from "./SigninWGoogle";
 
 interface User {
   id: string;
@@ -13,13 +14,7 @@ interface User {
 }
 
 const Navbar = () => {
-  const user = {
-    username: "prathamesh",
-  };
-
-  const handleSignIn = () => {
-    signIn("google");
-  };
+  const session = useSession()
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6 shadow-md">
@@ -28,24 +23,22 @@ const Navbar = () => {
           <h1 className="text-black dark:text-white text-xl font-semibold">
             qPortfolio
           </h1>
-          <button onClick={handleSignIn}>Signin with Google</button>
         </div>
         <div className="flex flex-row">
           <ThemeSwitch />
-          {user ? (
+          {session ? (
             <div className="flex items-center space-x-3 ml-3">
               <div className="hidden sm:flex items-center space-x-2">
                 <Image
-                  src={TempProfilePicture}
+                  src={session.data?.user.image ? session.data?.user.image : ""}
                   alt="avatar"
                   className="w-[30px] h-[30px] rounded-full bg-red-500 object-contain"
                   height={50}
                   width={50}
                 />
-                <span className="text-lg flex font-medium whitespace-nowrap text-white">
+                <span className="text-lg font-medium flex whitespace-nowrap text-black dark:text-white">
                   Hey,{" "}
-                  {user?.username?.charAt(0).toUpperCase() +
-                    user?.username?.slice(1)}
+                  {session.data?.user.name}
                 </span>
               </div>
               <PrimaryButton
@@ -55,11 +48,8 @@ const Navbar = () => {
               />
             </div>
           ) : (
-            <PrimaryButton
-              className="dark:bg-white bg-black dark:text-black text-white dark:disabled:bg-gray-400 disabled:bg-gray-200"
-              title="Login"
-              onClick={handleSignIn}
-            />
+            <SigninWGoogle />
+
           )}
         </div>
       </div>

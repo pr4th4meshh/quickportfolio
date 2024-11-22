@@ -19,7 +19,7 @@ export default async function Home() {
   console.log(user)
   return (
     <div className="">
-      <Hero user={user} />
+      <Hero />
     </div>
   )
 }
