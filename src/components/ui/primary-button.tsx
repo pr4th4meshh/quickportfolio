@@ -20,7 +20,7 @@ const PrimaryButton = ({
     <button
       onClick={onClick}
       className={cn(
-        "px-4 py-2 rounded-full border border-neutral-600 text-black bg-white transition duration-200 flex justify-center items-center",
+        "px-4 py-2 rounded-full border border-neutral-600 text-black bg-white transition duration-200 flex justify-center items-center disabled:opacity-50",
         className
       )}
       disabled={disabled}

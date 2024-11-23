@@ -8,6 +8,97 @@ interface IProject {
   timeline: string
 }
 
+interface ISocialLink {
+  twitter: string
+  linkedin: string
+  github: string
+  instagram: string
+  youtube: string
+  medium: string
+  website: string
+  behance: string
+  figma: string
+  awwwards: string
+  dribbble: string
+}
+
+// export async function POST(req: Request) {
+//   try {
+//     const {
+//       fullName,
+//       profession,
+//       headline,
+//       theme,
+//       features,
+//       projects,
+//       username,
+//       github,
+//       instagram,
+//       youtube,
+//       medium,
+//       website,
+//       behance,
+//       figma,
+//       awwwards,
+//       dribbble,
+//     } = await req.json()
+
+//     // Sample userId
+//     const userId = "6735d02865a0df869b179680"
+
+//     // const existingPortfolioByUsername = await prisma.portfolio.findFirst({
+//     //   where: {
+//     //     userId
+//     //   }
+//     // })
+
+//     // if(existingPortfolioByUsername) {
+//     //   return NextResponse.json({ message: "User already has a portfolio" }, { status: 400 });
+//     // }
+
+//     // checking for missing required fields
+//     if (!fullName || !profession || !features || !projects) {
+//       return NextResponse.json(
+//         { message: "Missing required fields" },
+//         { status: 400 }
+//       )
+//     }
+
+//     // create a new portfolio
+//     const portfolio = await prisma.portfolio.create({
+//       data: {
+//         username,
+//         fullName,
+//         profession,
+//         headline,
+//         theme: theme || "modern",
+//         features,
+//         userId,
+//         socialMedia: {
+          
+//         },
+//         projects: {
+//           create: projects.map((project: IProject) => ({
+//             title: project.title,
+//             description: project.description,
+//             link: project.link || "",
+//             timeline: project.timeline || "",
+//           })),
+//         },
+//       },
+//     })
+
+//     // Return the created portfolio in the response
+//     return NextResponse.json({ portfolio }, { status: 201 })
+//   } catch (error) {
+//     console.error("Error creating portfolio:", error)
+//     return NextResponse.json(
+//       { message: "Internal server error" },
+//       { status: 500 }
+//     )
+//   }
+// }
+
 export async function POST(req: Request) {
   try {
     const {
@@ -18,39 +109,21 @@ export async function POST(req: Request) {
       features,
       projects,
       username,
-      github,
-      instagram,
-      youtube,
-      medium,
-      website,
-      behance,
-      figma,
-      awwwards,
-      dribbble,
+      socialMedia,
     } = await req.json()
 
     // Sample userId
-    const userId = "6735d02865a0df869b179680"
+    const userId = "674075b9c0aa30dc22aee4d6"
 
-    // const existingPortfolioByUsername = await prisma.portfolio.findFirst({
-    //   where: {
-    //     userId
-    //   }
-    // })
-
-    // if(existingPortfolioByUsername) {
-    //   return NextResponse.json({ message: "User already has a portfolio" }, { status: 400 });
-    // }
-
-    // checking for missing required fields
-    if (!fullName || !profession || !features || !projects) {
+    // Checking for missing required fields
+    if (!fullName || !profession || !features || !projects ) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
       )
     }
 
-    // create a new portfolio
+    // Create a new portfolio with the socialMedia
     const portfolio = await prisma.portfolio.create({
       data: {
         username,
@@ -60,15 +133,10 @@ export async function POST(req: Request) {
         theme: theme || "modern",
         features,
         userId,
-        github,
-        figma,
-        instagram,
-        youtube,
-        medium,
-        website,
-        behance,
-        awwwards,
-        dribbble,
+        // socialMedia: socialMedia ? [socialMedia] : [],
+        socialMedia: {
+          create: socialMedia,
+        },
         projects: {
           create: projects.map((project: IProject) => ({
             title: project.title,
@@ -76,8 +144,8 @@ export async function POST(req: Request) {
             link: project.link || "",
             timeline: project.timeline || "",
           })),
-        }
-      },
+        },
+      }
     })
 
     // Return the created portfolio in the response
@@ -109,6 +177,7 @@ export async function GET(req: Request) {
       },
       include: {
         projects: true,
+        socialMedia: true
       },
     })
 

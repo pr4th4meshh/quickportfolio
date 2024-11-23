@@ -64,10 +64,10 @@ const FloatingDockMobile = ({
                   opacity: 0,
                   y: 10,
                   transition: {
-                    delay: idx * 0.05,
+                    delay: idx * 0.01,
                   },
                 }}
-                transition={{ delay: (items.length - 1 - idx) * 0.05 }}
+                transition={{ delay: (items.length - 1 - idx) * 0.01 }}
               >
                 <Link
                   href={item.href}

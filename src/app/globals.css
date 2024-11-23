@@ -11,3 +11,9 @@
   font-family: Inter, sans-serif;
   font-weight: 500;
 }
+
+.customFormScrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: gray rgba(255, 255, 255, 0.1);
+  scrollbar-track-color: antiquewhite;
+}

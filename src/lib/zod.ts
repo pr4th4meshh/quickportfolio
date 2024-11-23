@@ -27,39 +27,37 @@ export type FormFields = z.infer<typeof SignupSchemaFrontend>
 export type LoginFields = z.infer<typeof LoginSchemaFrontend>
 
 export const formSchema = z.object({
-  username: z.string().min(3, { message: "Username must be at least 3 characters long" }),
-  name: z.string().min(3, { message: "Name must be at least 3 characters long" }),
-  profession: z.string().min(3, { message: "Profession is required" }),
-  headline: z.string().optional(),
-  photo: z.string().url().optional(),
-  theme: z.object({
-    style: z.enum(["modern", "creative", "professional", "bold"]),
-    aiGenerated: z.boolean()
-  }),
-  socialLinks: z.object({
-    twitter: z.string().url().optional(),
-    linkedin: z.string().url().optional(),
-    github: z.string().url().optional(),
-  }),
+  username: z.string().min(3).max(20).regex(/^\S*$/, "Spaces are not allowed"),
+  fullName: z.string().min(2).max(50),
+  profession: z.string().min(2).max(50),
+  headline: z.string().max(160),
+  theme: z
+    .enum(["modern", "creative", "professional", "bold"])
+    .default("modern"),
+  features: z.any(),
   projects: z.array(
     z.object({
-      title: z.string().min(1, { message: "Title is required" }),
-      description: z.string().min(1, { message: "Description is required" }),
-      link: z.string().url().optional(),
-      timeline: z.string().optional(),
+      title: z.string().min(3).max(50),
+      description: z.string().max(500),
+      link: z.string().url("Enter a valid URL").optional(),
+      timeline: z.string(),
     })
   ),
-  skills: z.array(z.string()).optional(),
-  achievements: z.array(
-    z.object({
-      title: z.string().optional(),
-      issuer: z.string().optional(),
-      date: z.string().optional(),
-    })
-  ),
+  socialLinks: z.object({
+    twitter: z.string().optional(),
+    linkedin: z.string().optional(),
+    github: z.string().optional(),
+    instagram: z.string().optional(),
+    youtube: z.string().optional(),
+    medium: z.string().optional(),
+    website: z.string().optional(),
+    behance: z.string().optional(),
+    figma: z.string().optional(),
+    awwwards: z.string().optional(),
+    dribbble: z.string().optional(),
+  }),
   blogEnabled: z.boolean(),
   analyticsEnabled: z.boolean(),
-  collaborators: z.array(z.string()).optional(),
 })
 
 export type FormData = z.infer<typeof formSchema>

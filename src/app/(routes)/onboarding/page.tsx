@@ -1,44 +1,32 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import {
   FaChevronRight,
   FaPalette,
   FaChartBar,
   FaBook,
-  FaMagic
+  FaMagic,
+  FaLinkedin,
+  FaBehance,
+  FaFigma,
+  FaProjectDiagram,
+  FaDribbble,
+  FaGithub,
+  FaGlobe,
+  FaInstagram,
+  FaMedium,
+  FaTwitter,
+  FaYoutube,
 } from "react-icons/fa"
 import { WavyBackground } from "@/components/ui/wavy-background"
 import PrimaryButton from "@/components/ui/primary-button"
 import { BiLeftArrowAlt } from "react-icons/bi"
 import { useRouter } from "next/navigation"
-// import { toast } from '@/components/ui/use-toast'
-
-const formSchema = z.object({
-  username: z.string().min(3).max(20),
-  fullName: z.string().min(2).max(50),
-  profession: z.string().min(2).max(50),
-  headline: z.string().max(160),
-  theme: z
-    .enum(["modern", "creative", "professional", "bold"])
-    .default("modern"),
-  features: z.array(z.string()),
-  projects: z.array(
-    z.object({
-      title: z.string().min(3).max(50),
-      description: z.string().max(500),
-      link: z.string().url().optional(),
-      timeline: z.string(),
-    })
-  ),
-  blogEnabled: z.boolean(),
-  analyticsEnabled: z.boolean(),
-})
-
-type FormData = z.infer<typeof formSchema>
+import { formSchema, FormData } from "@/lib/zod"
+import { CustomTagsInput } from "@/components/CustomTagsInput"
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(1)
@@ -49,6 +37,7 @@ export default function OnboardingForm() {
     background: "#ffffff",
     text: "#1f2937",
   })
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
 
   const router = useRouter()
 
@@ -73,15 +62,19 @@ export default function OnboardingForm() {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true)
-      const features = []
-      features.push("Java")
-      features.push("Python")
+      const features = selectedFeatures;
+
+      const socialLinks = Object.fromEntries(
+        Object.entries(data.socialLinks).filter(
+          ([_, value]) => value !== null && value !== undefined && value !== ""
+        )
+      )
       const res = await fetch("/api/portfolio", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...data, features }),
+        body: JSON.stringify({ ...data, features, socialLinks }),
       })
       setIsLoading(false)
       if (!res.ok) {
@@ -90,7 +83,8 @@ export default function OnboardingForm() {
         router.push(`/${data.username}`)
       }
     } catch (error) {
-      console.log(error.message)
+      console.log(error)
+      setIsLoading(false)
     }
   }
 
@@ -99,7 +93,7 @@ export default function OnboardingForm() {
   }
 
   const handlePrevious = () => {
-    setStep((prev) => (prev -= 1))
+    setStep((prev) => prev - 1)
   }
 
   const { fields, append, remove } = useFieldArray({
@@ -132,26 +126,14 @@ export default function OnboardingForm() {
       const data = await response.json()
       const colors = JSON.parse(data.result)
       setAiGeneratedColors(colors)
-
-      toast({
-        title: "Color Scheme Generated",
-        description: "AI has created a unique color scheme for your profile.",
-      })
     } catch (error) {
       console.error("Error generating color scheme:", error)
-      toast({
-        title: "Error",
-        description: "Failed to generate color scheme. Please try again.",
-        variant: "destructive",
-      })
     } finally {
       setIsLoading(false)
     }
   }
 
-  const generateAIContent = async (
-    field: "headline" | "projectDescription"
-  ) => {
+  const generateAIContent = async (field: "headline" | "projectDescription") => {
     setIsLoading(true)
     try {
       const response = await fetch("/api/openai", {
@@ -162,7 +144,7 @@ export default function OnboardingForm() {
         body: JSON.stringify({
           prompt: `Generate a ${field} for a ${watch(
             "profession"
-          )} named ${watch("name")}. Keep it concise and professional.`,
+          )} named ${watch("username")}. Keep it concise and professional.`,
           max_tokens: 50,
         }),
       })
@@ -172,19 +154,7 @@ export default function OnboardingForm() {
       }
 
       const data = await response.json()
-      setValue(field, data.result.trim())
-
-      toast({
-        title: `${field.charAt(0).toUpperCase() + field.slice(1)} Generated`,
-        description: `AI has created a ${field} for your profile.`,
-      })
-    } catch (error) {
-      console.error(`Error generating ${field}:`, error)
-      toast({
-        title: "Error",
-        description: `Failed to generate ${field}. Please try again.`,
-        variant: "destructive",
-      })
+      // setValue(field, data.result.trim())
     } finally {
       setIsLoading(false)
     }
@@ -197,7 +167,7 @@ export default function OnboardingForm() {
           <h1 className="text-2xl font-semibold">
             Create Your Enhanced Portfolio
           </h1>
-          <p className="text-sm text-gray-500">Step {step} of 4</p>
+          <p className="text-sm text-gray-500">Step {step} of 5</p>
 
           {step > 1 && (
             <button
@@ -257,12 +227,9 @@ export default function OnboardingForm() {
             )}
 
             {step === 2 && (
-              <div>
+              <div className="space-y-2">
                 <div className="space-y-2">
-                  <label
-                    htmlFor="profession"
-                    className="block text-sm font-medium"
-                  >
+                  <label htmlFor="profession" className="block text-sm font-medium">
                     What do you do?
                   </label>
                   <input
@@ -278,10 +245,7 @@ export default function OnboardingForm() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label
-                    htmlFor="headline"
-                    className="block text-sm font-medium"
-                  >
+                  <label htmlFor="headline" className="block text-sm font-medium">
                     Your headline
                   </label>
                   <div className="flex space-x-2">
@@ -297,7 +261,7 @@ export default function OnboardingForm() {
                       onClick={() => generateAIContent("headline")}
                       disabled={isLoading}
                     >
-                      <FaMagic className="w-4 h-4" />
+                      <FaMagic className="text-xl mr-2" />
                     </button>
                   </div>
                   {errors.headline && (
@@ -308,28 +272,14 @@ export default function OnboardingForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <label
-                    htmlFor="features"
-                    className="block text-sm font-medium"
-                  >
+                  <label htmlFor="features" className="block text-sm font-medium">
                     Your Features
                   </label>
-                  <div className="flex space-x-2">
-                    <textarea
-                      id="features"
-                      placeholder="Java, Python..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      {...register("features")}
-                    />
-                    <button
-                      type="button"
-                      className="px-3 py-2 border border-gray-300 rounded-md dark:bg-black bg-white hover:bg-gray-200 focus:outline-none"
-                      onClick={() => generateAIContent("headline")}
-                      disabled={isLoading}
-                    >
-                      <FaMagic className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <CustomTagsInput
+                    tags={selectedFeatures}
+                    setTags={setSelectedFeatures}
+                    placeholder="Enter your skills"
+                  />
                   {errors.features && (
                     <p className="text-sm text-red-500">
                       {errors.features.message}
@@ -361,7 +311,7 @@ export default function OnboardingForm() {
                     onClick={generateAIColorScheme}
                     disabled={isLoading}
                   >
-                    <FaPalette className="w-4 h-4 mr-2" />
+                    <FaPalette className="text-xl mr-2" />
                     {isLoading ? "Generating..." : "Generate AI Color Scheme"}
                   </button>
                 </div>
@@ -381,7 +331,7 @@ export default function OnboardingForm() {
                         setValue("analyticsEnabled", !watch("analyticsEnabled"))
                       }
                     >
-                      <FaChartBar className="w-4 h-4 mr-2" />
+                      <FaChartBar className="text-xl mr-2" />
                       Analytics
                     </button>
                     <button
@@ -395,7 +345,7 @@ export default function OnboardingForm() {
                         setValue("blogEnabled", !watch("blogEnabled"))
                       }
                     >
-                      <FaBook className="w-4 h-4 mr-2" />
+                      <FaBook className="text-xl mr-2" />
                       Blog
                     </button>
                   </div>
@@ -404,13 +354,16 @@ export default function OnboardingForm() {
             )}
 
             {step === 4 && (
-              <div className="space-y-4">
+              <div className="space-y-4 h-[50vh] overflow-hidden overflow-y-scroll customFormScrollbar py-4">
                 <h2 className="text-lg font-semibold">Projects</h2>
                 {fields.map((item, index) => (
                   <div
                     key={item.id}
                     className="space-y-2 p-4 border border-input rounded-md"
                   >
+                    <h1 className="text-xl font-bold text-center text-blue-300 mb-3 uppercase">
+                      Project {index + 1}
+                    </h1>
                     <label
                       htmlFor={`projects.${index}.title`}
                       className="block text-sm font-medium"
@@ -424,7 +377,7 @@ export default function OnboardingForm() {
                       {...register(`projects.${index}.title` as const)}
                     />
                     {errors.projects?.[index]?.title && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-red-500">
                         {errors.projects[index].title.message}
                       </p>
                     )}
@@ -442,7 +395,7 @@ export default function OnboardingForm() {
                       {...register(`projects.${index}.description` as const)}
                     />
                     {errors.projects?.[index]?.description && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-red-500">
                         {errors.projects[index].description.message}
                       </p>
                     )}
@@ -451,7 +404,7 @@ export default function OnboardingForm() {
                       htmlFor={`projects.${index}.link`}
                       className="block text-sm font-medium"
                     >
-                      Project Link
+                Project Link
                     </label>
                     <input
                       id={`projects.${index}.link`}
@@ -460,7 +413,7 @@ export default function OnboardingForm() {
                       {...register(`projects.${index}.link` as const)}
                     />
                     {errors.projects?.[index]?.link && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-red-500">
                         {errors.projects[index].link.message}
                       </p>
                     )}
@@ -478,14 +431,14 @@ export default function OnboardingForm() {
                       {...register(`projects.${index}.timeline` as const)}
                     />
                     {errors.projects?.[index]?.timeline && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-red-500">
                         {errors.projects[index].timeline.message}
                       </p>
                     )}
 
                     <button
                       type="button"
-                      className="text-destructive"
+                      className="bg-red-500 text-white px-2 py-1 rounded-md"
                       onClick={() => remove(index)}
                     >
                       Remove Project
@@ -494,7 +447,7 @@ export default function OnboardingForm() {
                 ))}
                 <button
                   type="button"
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background hover:bg-accent focus:outline-none"
+                  className="w-full px-3 py-2 border border-input rounded-md dark:bg-white dark:text-black text-white bg-black hover:bg-accent focus:outline-none"
                   onClick={() =>
                     append({
                       title: "",
@@ -509,8 +462,76 @@ export default function OnboardingForm() {
               </div>
             )}
 
+            {step === 5 && (
+              <div className="space-y-6 h-[30vh] overflow-hidden overflow-y-scroll customFormScrollbar">
+                <h2 className="text-lg font-semibold">
+                  Add Social Media Links
+                </h2>
+
+                {[
+                  "twitter",
+                  "linkedin",
+                  "github",
+                  "instagram",
+                  "youtube",
+                  "medium",
+                  "website",
+                  "behance",
+                  "figma",
+                  "awwwards",
+                  "dribbble"
+                ].map((platform: string) => (
+                  <div key={platform} className="space-y-2">
+                    <span className="flex items-center">
+                      {platform === "twitter" ? (
+                        <FaTwitter className="text-xl mr-2" />
+                      ) : platform === "dribbble" ? (
+                        <FaDribbble className="text-xl mr-2" />
+                      ) : platform === "github" ? (
+                        <FaGithub className="text-xl mr-2" />
+                      ) : platform === "instagram" ? (
+                        <FaInstagram className="text-xl mr-2" />
+                      ) : platform === "youtube" ? (
+                        <FaYoutube className="text-xl mr-2" />
+                      ) : platform === "medium" ? (
+                        <FaMedium className="text-xl mr-2" />
+                      ) : platform === "website" ? (
+                        <FaGlobe className="text-xl mr-2" />
+                      ) : platform === "linkedin" ? (
+                        <FaLinkedin className="text-xl mr-2" />
+                      ) : platform === "behance" ? (
+                        <FaBehance className="text-xl mr-2" />
+                      ) : platform === "figma" ? (
+                        <FaFigma className="text-xl mr-2" />
+                      ) : platform === "awwwards" ? (
+                        <FaProjectDiagram className="text-xl mr-2" />
+                      ) : null}
+                      {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                    </span>
+                    {/* {
+                      <input
+                        type="url"
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder={`Enter your ${platform} link`}
+                        {...register(`socialLinks.${platform}`)}
+                      />
+                    } */}
+                    {(
+                      <input
+                        type="url"
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder={`Enter your ${platform} link`}
+                        {...register(`socialLinks.${platform}`)}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+
             <div className="flex justify-between">
-              {step < 4 ? (
+              {step < 5 ? (
                 <PrimaryButton
                   title="Next Step"
                   onClick={handleNext}

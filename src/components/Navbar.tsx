@@ -18,7 +18,7 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6 shadow-md">
-      <div className="flex items-center justify-between mx-auto w-min sm:w-[30vw] border-gray-400 border-2 py-4 sm:py-4 px-6 sm:px-8 rounded-full space-x-6">
+      <div className="flex items-center justify-between mx-auto w-min sm:w-[50vw] border-[#404040] border-2 py-4 sm:py-4 px-6 sm:px-8 rounded-full space-x-6">
         <div>
           <h1 className="text-black dark:text-white text-xl font-semibold">
             qPortfolio
@@ -26,11 +26,11 @@ const Navbar = () => {
         </div>
         <div className="flex flex-row">
           <ThemeSwitch />
-          {session ? (
+          {session?.data?.user ? (
             <div className="flex items-center space-x-3 ml-3">
-              <div className="hidden sm:flex items-center space-x-2">
+              <div className="hidden sm:flex items-center space-x-1">
                 <Image
-                  src={session.data?.user.image ? session.data?.user.image : ""}
+                  src={session.data?.user.image ? session.data?.user.image : TempProfilePicture}
                   alt="avatar"
                   className="w-[30px] h-[30px] rounded-full bg-red-500 object-contain"
                   height={50}
