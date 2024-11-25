@@ -14,7 +14,7 @@ export const LoginSchema = z.object({
 // frontend validation
 export const SignupSchemaFrontend = z.object({
   email: z.string().email(),
-  username: z.string().min(3),
+  name: z.string().min(3),
   password: z.string().min(6),
 })
 

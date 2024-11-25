@@ -8,7 +8,7 @@ const SigninWGoogle = () => {
     signIn("google")
     console.log("clicked")
   }
-  return <PrimaryButton title="Sign in" onClick={handleSignIn} />
+  return <PrimaryButton title="Sign in with Google" onClick={handleSignIn} />
 }
 
 export default SigninWGoogle
