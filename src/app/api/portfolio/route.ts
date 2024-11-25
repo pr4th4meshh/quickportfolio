@@ -74,7 +74,7 @@ interface ISocialLink {
 //         theme: theme || "modern",
 //         features,
 //         userId,
-//         socialMedia: {
+//         socialLinks: {
           
 //         },
 //         projects: {
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
       features,
       projects,
       username,
-      socialMedia,
+      socialLinks,
     } = await req.json()
 
     // Sample userId
@@ -123,7 +123,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // Create a new portfolio with the socialMedia
+    // Create a new portfolio with the socialLinks
     const portfolio = await prisma.portfolio.create({
       data: {
         username,
@@ -133,9 +133,9 @@ export async function POST(req: Request) {
         theme: theme || "modern",
         features,
         userId,
-        // socialMedia: socialMedia ? [socialMedia] : [],
+        // socialLinks: socialLinks ? [socialLinks] : [],
         socialMedia: {
-          create: socialMedia,
+          create: socialLinks,
         },
         projects: {
           create: projects.map((project: IProject) => ({
@@ -145,6 +145,10 @@ export async function POST(req: Request) {
             timeline: project.timeline || "",
           })),
         },
+      },
+      include: {
+        socialMedia: true,
+        projects: true,
       }
     })
 
@@ -162,22 +166,37 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
-    const portfolioIdUser = url.searchParams.get("portfolioId")
+    const portfolioUsername = url.searchParams.get("portfolioId")
 
-    if (!portfolioIdUser) {
+    if (!portfolioUsername) {
       return NextResponse.json(
-        { message: "Missing portfolioId" },
+        { message: "Missing userId" },
         { status: 400 }
       )
     }
 
+    // const findUser = await prisma.user.findFirst({
+    //   where: {
+    //     name: portfolioUsername,
+    //   },
+    // })
+
+    // console.log("userId", findUser);
+
+    // if (!findUser) {
+    //   return NextResponse.json(
+    //     { message: "User Id not found" },
+    //     { status: 404 }
+    //   )
+    // }
+
     const portfolio = await prisma.portfolio.findFirst({
       where: {
-        userId: portfolioIdUser,
+        id: portfolioUsername,
       },
       include: {
         projects: true,
-        socialMedia: true
+        socialMedia: true,
       },
     })
 

@@ -43,7 +43,7 @@ export const formSchema = z.object({
       timeline: z.string(),
     })
   ),
-  socialLinks: z.object({
+  socialMedia: z.object({
     twitter: z.string().optional(),
     linkedin: z.string().optional(),
     github: z.string().optional(),

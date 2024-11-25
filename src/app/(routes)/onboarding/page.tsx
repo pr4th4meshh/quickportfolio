@@ -59,13 +59,14 @@ export default function OnboardingForm() {
     },
   })
 
+  // console.log()
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true)
       const features = selectedFeatures;
 
       const socialLinks = Object.fromEntries(
-        Object.entries(data.socialLinks).filter(
+        Object.entries(data.socialMedia).filter(
           ([_, value]) => value !== null && value !== undefined && value !== ""
         )
       )
@@ -88,11 +89,13 @@ export default function OnboardingForm() {
     }
   }
 
-  const handleNext = () => {
+  const handleNext = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
     setStep((prev) => prev + 1)
   }
 
-  const handlePrevious = () => {
+  const handlePrevious = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
     setStep((prev) => prev - 1)
   }
 
@@ -100,65 +103,6 @@ export default function OnboardingForm() {
     control,
     name: "projects",
   })
-
-  const generateAIColorScheme = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: `Generate a color scheme for a ${watch(
-            "profession"
-          )} with a ${watch(
-            "theme"
-          )} style. Return only a JSON object with primary, secondary, background, and text colors in hex format.`,
-          max_tokens: 100,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to generate color scheme")
-      }
-
-      const data = await response.json()
-      const colors = JSON.parse(data.result)
-      setAiGeneratedColors(colors)
-    } catch (error) {
-      console.error("Error generating color scheme:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const generateAIContent = async (field: "headline" | "projectDescription") => {
-    setIsLoading(true)
-    try {
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: `Generate a ${field} for a ${watch(
-            "profession"
-          )} named ${watch("username")}. Keep it concise and professional.`,
-          max_tokens: 50,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to generate ${field}`)
-      }
-
-      const data = await response.json()
-      // setValue(field, data.result.trim())
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   return (
     <WavyBackground>
@@ -258,7 +202,7 @@ export default function OnboardingForm() {
                     <button
                       type="button"
                       className="px-3 py-2 border border-gray-300 rounded-md dark:bg-black bg-white hover:bg-gray-200 focus:outline-none"
-                      onClick={() => generateAIContent("headline")}
+                      onClick={() => null}
                       disabled={isLoading}
                     >
                       <FaMagic className="text-xl mr-2" />
@@ -308,7 +252,7 @@ export default function OnboardingForm() {
                   <button
                     type="button"
                     className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md dark:bg-black bg-white focus:outline-none"
-                    onClick={generateAIColorScheme}
+                    onClick={() => null}
                     disabled={isLoading}
                   >
                     <FaPalette className="text-xl mr-2" />
@@ -508,20 +452,12 @@ export default function OnboardingForm() {
                       ) : null}
                       {platform.charAt(0).toUpperCase() + platform.slice(1)}
                     </span>
-                    {/* {
-                      <input
-                        type="url"
-                        className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder={`Enter your ${platform} link`}
-                        {...register(`socialLinks.${platform}`)}
-                      />
-                    } */}
                     {(
                       <input
                         type="url"
                         className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder={`Enter your ${platform} link`}
-                        {...register(`socialLinks.${platform}`)}
+                        {...register(`socialMedia.${platform}`)}
                       />
                     )}
                   </div>
@@ -531,19 +467,19 @@ export default function OnboardingForm() {
 
 
             <div className="flex justify-between">
-              {step < 5 ? (
-                <PrimaryButton
-                  title="Next Step"
-                  onClick={handleNext}
-                  icon={<FaChevronRight className="mr-1" />}
-                />
-              ) : (
-                <PrimaryButton
-                  title={isLoading ? "Creating Profile..." : "Create Profile"}
-                  type="submit"
-                  disabled={isLoading}
-                />
-              )}
+            {step === 5 ? (
+  <PrimaryButton
+    title={isLoading ? "Creating Profile..." : "Create Profile"}
+    type="submit"
+    disabled={isLoading}
+  />
+) : (
+  <PrimaryButton
+    title="Next Step"
+    onClick={handleNext}
+    icon={<FaChevronRight className="mr-1" />}
+  />
+)}
             </div>
           </form>
         </div>
