@@ -4,6 +4,12 @@ import { signIn } from "next-auth/react"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcrypt"
 
+interface IFormData { 
+  name: string
+  email: string
+  password: string
+}
+
 export async function registerUser(
   name: string,
   email: string,
@@ -35,18 +41,21 @@ export async function registerUser(
     })
 
     // Sign in the user
-    await signIn("credentials", { email, password, redirect: false })
+    const response = await signIn("credentials", { email, password })
+    
+    if(response?.error) {
+      return { error: response.error}
+    }
 
-    return { success: true }
+    return { success: true}
   } catch (error) {
     console.error("Registration error:", error)
-    return { error: "An error occurred during registration" }
   }
 }
 
 export async function authenticate(
   prevState: string | undefined,
-  formData: FormData
+  formData: IFormData
 ) {
   try {
     await signIn("credentials", formData)

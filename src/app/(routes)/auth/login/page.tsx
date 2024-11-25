@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import email from "next-auth/providers/email"
 import { useForm } from "react-hook-form"
 import Link from "next/link"
+import BorderStyleButton from "@/components/ui/border-button"
 
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState("")
@@ -40,7 +41,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen bg-black">
       <div className="w-full max-w-sm p-10 border border-gray-500 shadow-sm shadow-white rounded-lg">
         <h1 className="text-center text-2xl font-semibold mb-6">
           Login to QPortfolio
@@ -82,15 +83,12 @@ export default function LoginForm() {
             )}
           </div>
 
-          <button
+          <BorderStyleButton
+            title={isSubmitting ? "Submitting..." : "Login"}
             type="submit"
-            className={`w-full py-2 px-4 text-white font-semibold rounded-md ${
-              isSubmitting ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
-            }`}
             disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Sign Up"}
-          </button>
+          />
+          
         </form>
         <h1 className="text-center pt-2 text-md text-red-500">
           {errorMessage}

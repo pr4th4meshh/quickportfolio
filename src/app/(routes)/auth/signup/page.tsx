@@ -1,5 +1,6 @@
 "use client"
 import { registerUser } from "@/actions/registerUser"
+import BorderStyleButton from "@/components/ui/border-button"
 import { FormFields, SignupSchemaFrontend } from "@/lib/zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
@@ -28,14 +29,10 @@ const SignUp = () => {
 
       const response = await registerUser(name, email, password)
 
-      if (response.success) {
-        reset()
-        alert("User created successfully")
-        router.push("/auth/login")
-      }
-
-      if (response.error) {
+      if (response?.error) {
         setErrorMessage(response.error)
+      } else {
+        router.push("/auth/login")
       }
     } catch (error) {
       console.error(error)
@@ -43,7 +40,7 @@ const SignUp = () => {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen bg-black">
       <div className="w-full max-w-sm p-10 border border-gray-500 shadow-sm shadow-white rounded-lg">
         <h1 className="text-center text-2xl font-semibold mb-6">
           Sign Up to QPortfolio
@@ -101,17 +98,15 @@ const SignUp = () => {
             )}
           </div>
 
-          <button
+          <BorderStyleButton
+            title={isSubmitting ? "Submitting..." : "Sign Up"}
             type="submit"
-            className={`w-full py-2 px-4 text-white font-semibold rounded-md ${
-              isSubmitting ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
-            }`}
             disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Sign Up"}
-          </button>
+          />
         </form>
-        <h1 className="text-center pt-2 text-md text-red-500">{errorMessage}</h1>
+        <h1 className="text-center pt-2 text-md text-red-500">
+          {errorMessage}
+        </h1>
         <h1 className="text-center mt-5">
           Already have an account?{" "}
           <Link href="/auth/login" className="text-blue-400 underline">
