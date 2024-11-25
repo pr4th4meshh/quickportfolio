@@ -33,10 +33,10 @@ export const CustomTagsInput: React.FC<CustomTagsInputProps> = ({ tags, setTags,
   return (
     <div className="flex flex-wrap items-center p-2 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500">
       {tags.map((tag, index) => (
-        <div key={index} className="flex items-center bg-blue-100 text-blue-800 rounded-full px-2 py-1 m-1">
+        <div key={index} className="flex items-center bg-black text-white dark:bg-white dark:text-black rounded-full px-2 py-1 m-1">
           <span className="mr-1">{tag}</span>
           <button type="button" onClick={() => removeTag(tag)} className="focus:outline-none">
-            <FaTimes className="text-blue-600 hover:text-blue-800" />
+            <FaTimes className="dark:text-black text-white" />
           </button>
         </div>
       ))}
