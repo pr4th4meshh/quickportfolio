@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, use } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa"
@@ -14,6 +14,7 @@ import {
 } from "react-icons/fi"
 import { useParams } from "next/navigation"
 import { useSession } from "next-auth/react"
+import Loading from "@/components/Loading"
 
 interface ProfileData {
   username: string
@@ -53,23 +54,7 @@ interface ProfileData {
   collaborators: string[]
 }
 
-interface ProfileDataFromDB {
-  portfolio: {
-    _id: string
-    username: string
-    fullName: string
-    profession: string
-    headline: string
-    theme: string
-    features: string[]
-    userId: string
-  }
-}
-
 export default function Portfolio() {
-  const params = useParams()
-  console.log(params.portfolioUsername, "PARAMS 1")
-  const [profileData0, setProfileData0] = useState<ProfileData | null>(null)
   const [profileData, setProfileData] = useState<ProfileData>({
     username: "johndoe",
     name: "John Doe",
@@ -107,51 +92,74 @@ export default function Portfolio() {
     collaborators: ["team@example.com"],
   })
 
-  const session = useSession()
-  console.log(session, "session 01010100101010")
+  const params = useParams();
+  const [profileData0, setProfileData0] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const session = useSession();
 
   const handleGetPortfolioInformation = async () => {
-    try {
-      // Ensure session data is available
-      if (!session.data?.user.id) {
-        console.error("User session not found.")
-        return
-      }
+    if (!session.data?.user?.id) {
+      console.error("User session not found.");
+      return;
+    }
 
-      // const response = await fetch(`/api/portfolio?portfolioId=${session.data?.user.id}`);
+    try {
       const response = await fetch(
-        `/api/portfolio?portfolioId=674075b9c0aa30dc22aee4d6`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
+        `/api/portfolio?portfolioId=${session.data.user.id}`
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch portfolio data")
+        throw new Error("Failed to fetch portfolio data.");
       }
 
-      const data = await response.json()
-
+      const data = await response.json();
       if (data) {
-        setProfileData0(data) // Assuming the shape matches ProfileDataFromDB
+        setProfileData0(data); // Adjust this based on the API response structure
+      } else {
+        console.error("Portfolio fetch failed:", data.message);
       }
     } catch (error) {
-      console.error("Error fetching portfolio data:", error)
+      console.error("Error fetching portfolio data:", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      handleGetPortfolioInformation();
+    }
+  }, [session.status]);
+
+  const handleEndorsement = (skillIndex: number) => {
+    if (!profileData0) return;
+
+    setProfileData0((prev) => {
+      if (!prev) return null;
+
+      const updatedSkills = [...prev.skills];
+      updatedSkills[skillIndex].endorsements += 1;
+
+      return {
+        ...prev,
+        skills: updatedSkills,
+      };
+    });
+  };
+
+  if (loading) {
+    return <div className="min-h-screen flex dark:bg-dark bg-light items-center justify-center">
+      <Loading />
+    </div>;
   }
 
-
-  console.log(profileData0)
-  useEffect(() => {
-    console.log("useEffect triggered");
-    handleGetPortfolioInformation()
-  }, [])
-
-  const [showAnalytics, setShowAnalytics] = useState(false)
-
+  if (!profileData0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        No profile data found.
+      </div>
+    );
+  }
   const backgroundStyle = {
     modern: `
       bg-gradient-to-r from-blue-100 via-blue-300 to-blue-500
@@ -196,26 +204,6 @@ export default function Portfolio() {
     `,
   }
 
-  // useEffect(() => {
-  //   // Simulated view count increment
-  //   const newViews = profileData.analytics.views + 1
-  //   setProfileData((prev) => ({
-  //     ...prev,
-  //     analytics: { ...prev.analytics, views: newViews },
-  //   }))
-  // }, [])
-
-  const handleEndorsement = (skillIndex: number) => {
-    setProfileData((prev) => {
-      const newSkills = [...prev.skills]
-      newSkills[skillIndex] = {
-        ...newSkills[skillIndex],
-        endorsements: newSkills[skillIndex].endorsements + 1,
-      }
-      return { ...prev, skills: newSkills }
-    })
-  }
-
   return (
     // <div className={`min-h-screen ${backgroundStyle["bold"]} `}>
     <div className="min-h-screen bg-black">
@@ -230,7 +218,7 @@ export default function Portfolio() {
               </div>
               <button
                 className="btn btn-secondary btn-sm"
-                onClick={() => setShowAnalytics(!showAnalytics)}
+                // onClick={() => setShowAnalytics(!showAnalytics)}
               >
                 <FiBarChart className="w-4 h-4 mr-2" />
                 View Analytics
@@ -241,13 +229,13 @@ export default function Portfolio() {
           {/* Profile Header */}
           <div className="text-center space-y-4">
             <div className="relative inline-block">
-              <Image
+              {/* <Image
                 src={session.data?.user.image ? session.data?.user.image : ""}
                 alt={profileData.name}
                 width={200}
                 height={200}
                 className="rounded-full border-4 border-background"
-              />
+              /> */}
               <button
                 className="absolute bottom-0 right-0 rounded-full p-2 bg-transparent border-2 border-primary"
                 aria-label="Edit Profile"
@@ -256,14 +244,14 @@ export default function Portfolio() {
               </button>
             </div>
             <div>
-              <h1 className="text-4xl font-bold">
-                {params.portfolioUsername}
-              </h1>
+              <h1 className="text-4xl font-bold">{params.portfolioUsername}</h1>
               <p className="text-xl text-muted-foreground">
                 {profileData0?.profession}
               </p>
             </div>
-            <p className="text-lg max-w-2xl mx-auto">{profileData0?.headline}</p>
+            <p className="text-lg max-w-2xl mx-auto">
+              {profileData0?.headline}
+            </p>
             <div className="flex justify-center gap-4">
               {profileData.socialLinks.twitter && (
                 <Link href={profileData.socialLinks.twitter} target="_blank">

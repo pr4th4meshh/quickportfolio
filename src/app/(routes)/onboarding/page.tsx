@@ -27,6 +27,7 @@ import { BiLeftArrowAlt } from "react-icons/bi"
 import { useRouter } from "next/navigation"
 import { formSchema, FormData } from "@/lib/zod"
 import { CustomTagsInput } from "@/components/CustomTagsInput"
+import { useSession } from "next-auth/react"
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(1)
@@ -40,6 +41,7 @@ export default function OnboardingForm() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
 
   const router = useRouter()
+  const session = useSession()
 
   const {
     register,
@@ -305,7 +307,7 @@ export default function OnboardingForm() {
                     key={item.id}
                     className="space-y-2 p-4 border border-input rounded-md"
                   >
-                    <h1 className="text-xl font-bold text-center text-blue-300 mb-3 uppercase">
+                    <h1 className="text-xl font-bold text-center text-blue-500 dark:text-blue-300 mb-3 uppercase">
                       Project {index + 1}
                     </h1>
                     <label

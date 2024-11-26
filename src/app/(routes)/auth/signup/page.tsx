@@ -40,7 +40,7 @@ const SignUp = () => {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen bg-black">
+    <div className="flex justify-center items-center h-screen dark:bg-dark bg-light">
       <div className="w-full max-w-sm p-10 border border-gray-500 shadow-sm shadow-white rounded-lg">
         <h1 className="text-center text-2xl font-semibold mb-6">
           Sign Up to QPortfolio
@@ -59,7 +59,7 @@ const SignUp = () => {
               type="text"
               {...register("name")}
               placeholder="Enter your name.."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border dark:border-gray-300 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.name && (
               <p className="text-red-500 text-sm">{errors.name.message}</p>
@@ -75,7 +75,7 @@ const SignUp = () => {
               type="email"
               {...register("email")}
               placeholder="Enter your email.."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border dark:border-gray-300 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -91,7 +91,7 @@ const SignUp = () => {
               type="password"
               {...register("password")}
               placeholder="Enter your password.."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border dark:border-gray-300 border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>

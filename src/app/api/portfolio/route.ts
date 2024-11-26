@@ -1,4 +1,6 @@
-import prisma from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
+import { authOptions, getAuthSession } from "@/lib/serverAuth"
+import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
 interface IProject {
@@ -22,83 +24,6 @@ interface ISocialLink {
   dribbble: string
 }
 
-// export async function POST(req: Request) {
-//   try {
-//     const {
-//       fullName,
-//       profession,
-//       headline,
-//       theme,
-//       features,
-//       projects,
-//       username,
-//       github,
-//       instagram,
-//       youtube,
-//       medium,
-//       website,
-//       behance,
-//       figma,
-//       awwwards,
-//       dribbble,
-//     } = await req.json()
-
-//     // Sample userId
-//     const userId = "6735d02865a0df869b179680"
-
-//     // const existingPortfolioByUsername = await prisma.portfolio.findFirst({
-//     //   where: {
-//     //     userId
-//     //   }
-//     // })
-
-//     // if(existingPortfolioByUsername) {
-//     //   return NextResponse.json({ message: "User already has a portfolio" }, { status: 400 });
-//     // }
-
-//     // checking for missing required fields
-//     if (!fullName || !profession || !features || !projects) {
-//       return NextResponse.json(
-//         { message: "Missing required fields" },
-//         { status: 400 }
-//       )
-//     }
-
-//     // create a new portfolio
-//     const portfolio = await prisma.portfolio.create({
-//       data: {
-//         username,
-//         fullName,
-//         profession,
-//         headline,
-//         theme: theme || "modern",
-//         features,
-//         userId,
-//         socialLinks: {
-          
-//         },
-//         projects: {
-//           create: projects.map((project: IProject) => ({
-//             title: project.title,
-//             description: project.description,
-//             link: project.link || "",
-//             timeline: project.timeline || "",
-//           })),
-//         },
-//       },
-//     })
-
-//     // Return the created portfolio in the response
-//     return NextResponse.json({ portfolio }, { status: 201 })
-//   } catch (error) {
-//     console.error("Error creating portfolio:", error)
-//     return NextResponse.json(
-//       { message: "Internal server error" },
-//       { status: 500 }
-//     )
-//   }
-// }
-
 export async function POST(req: Request) {
   try {
     const {
@@ -112,13 +37,39 @@ export async function POST(req: Request) {
       socialLinks,
     } = await req.json()
 
-    // Sample userId
-    const userId = "674075b9c0aa30dc22aee4d6"
+    const session = await getServerSession(authOptions)
 
-    // Checking for missing required fields
-    if (!fullName || !profession || !features || !projects ) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
+    if (!session || !session.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    }
+
+    if (session) {
+      console.log("User name from getServerSession:", session.user?.name)
+    } else {
+      console.log("Session is undefined or expired")
+    }
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    }
+
+        // Checking for missing required fields
+        if (!fullName || !profession || !features || !projects) {
+          return NextResponse.json(
+            { message: "Missing required fields" },
+            { status: 400 }
+          )
+        }
+
+    const existingPortfolio = await prisma.portfolio.findUnique({
+      where: {
+        userId: session?.user?.id,
+      }
+    })
+
+    if (existingPortfolio) {
+      NextResponse.json(
+        { message: "You already have a portfolio" },
         { status: 400 }
       )
     }
@@ -132,7 +83,7 @@ export async function POST(req: Request) {
         headline,
         theme: theme || "modern",
         features,
-        userId,
+        userId: session?.user.id,
         // socialLinks: socialLinks ? [socialLinks] : [],
         socialMedia: {
           create: socialLinks,
@@ -149,7 +100,7 @@ export async function POST(req: Request) {
       include: {
         socialMedia: true,
         projects: true,
-      }
+      },
     })
 
     // Return the created portfolio in the response
@@ -169,10 +120,7 @@ export async function GET(req: Request) {
     const portfolioUsername = url.searchParams.get("portfolioId")
 
     if (!portfolioUsername) {
-      return NextResponse.json(
-        { message: "Missing userId" },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: "Missing userId" }, { status: 400 })
     }
 
     // const findUser = await prisma.user.findFirst({
@@ -192,7 +140,7 @@ export async function GET(req: Request) {
 
     const portfolio = await prisma.portfolio.findFirst({
       where: {
-        id: portfolioUsername,
+        userId: portfolioUsername,
       },
       include: {
         projects: true,

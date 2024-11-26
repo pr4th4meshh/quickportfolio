@@ -18,6 +18,8 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        light: "#e6e6e6",
+        dark: "#000000"
       },
       animation: {
         aurora: "aurora 10s linear infinite",

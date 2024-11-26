@@ -9,14 +9,29 @@ import { FaUpwork } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Navbar from "./Navbar"
+import { useEffect, useState } from "react"
+import { BiGlobe } from "react-icons/bi"
 
+interface Portfolio {
+  username: string
+  fullName: string
+  profession: string
+  headline: string
+  theme: string
+  features: string[]
+  projects: string[]
+}
 interface User {
   id: string
-  username: string
+  name: string
   email: string
+  portfolio: Portfolio
+  emailVerified: null | boolean
+  image: string
 }
 
 export default function Hero() {
+  const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
   const words = ["easy", "quick", "beautiful", "modern"]
   const links = [
@@ -49,16 +64,46 @@ export default function Hero() {
       href: "https://www.upwork.com/freelancers/~01d3757453c315801b?mp_source=share",
     },
     {
-      title: "Instagram",
+      title: "Website",
       icon: (
-        <IoLogoInstagram className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        <BiGlobe className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      href: "https://p4-portfolio.vercel.app/",
     },
   ]
 
-  const user = useSession()
-  console.log(user, "user via nextauth")
+  const session = useSession()
+  console.log("SSESSS", session)
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(
+        `/api/user?username=${session?.data?.user?.id}`
+      )
+      if (!response.ok) {
+        throw new Error("Failed to fetch portfolio data.")
+      }
+
+      const data = await response.json()
+      if (data) {
+        setUser(data)
+      } else {
+        console.error("Portfolio fetch failed:", data.message)
+      }
+    } catch (error) {
+      console.error("Error fetching portfolio data:", error)
+    } finally {
+      console.log("LOADING", false)
+    }
+  }
+
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      console.log("useeff trigg")
+      fetchUser()
+    }
+  }, [session.status])
+
+  console.log("USER", user)
   return (
     <WavyBackground>
       <Navbar />
@@ -73,11 +118,17 @@ export default function Hero() {
             portfolio site with just a few clicks
           </div>
 
-          <BorderStyleButton
-            title="Create your qPortfolio"
-            onClick={() => router.push("/onboarding")}
-            className="mt-20 w-[300px] flex self-center text-2xl items-center"
-          />
+          {
+            <BorderStyleButton
+              title="Create your qPortfolio"
+              onClick={() =>
+                user?.portfolio
+                  ? router.push(`/${user.portfolio.username}`)
+                  : router.push("/onboarding")
+              }
+              className="mt-20 w-[300px] flex self-center text-2xl items-center"
+            />
+          }
         </div>
         <FloatingDock
           desktopClassName="fixed bottom-10 right-10"

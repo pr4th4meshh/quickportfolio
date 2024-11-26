@@ -1,4 +1,3 @@
-"use client"
 import React from "react"
 import DarkModeToggle from "./DarkModeToggle"
 import PrimaryButton from "./ui/primary-button"
@@ -7,19 +6,20 @@ import Default_Avatar from "../../public/qp_default_avatar.jpg"
 import ThemeSwitch from "./ui/ThemeSwitch"
 import { signIn, signOut, useSession } from "next-auth/react"
 import SigninWGoogle from "./SigninWGoogle"
-import { useRouter } from "next/navigation"
+import { getAuthSession } from "@/lib/serverAuth"
+import Link from "next/link"
+import LogoutButton from "./LogoutButton"
 
 interface User {
   id: string
   username: string
 }
 
-const Navbar = () => {
-  const router = useRouter()
-  const session = useSession()
-  const handleLogout = () => {
-    signOut({callbackUrl: '/'})
-  }
+const ServerNavbar = async () => {
+  const session = await getAuthSession()
+  //  const handleLogout = () => {
+  //     signOut({callbackUrl: '/'})
+  //   }
 
   console.log(session)
 
@@ -28,20 +28,17 @@ const Navbar = () => {
       <div className="flex items-center justify-between mx-auto w-min sm:w-[50vw] border-[#404040] border-2 py-4 sm:py-4 px-6 sm:px-8 rounded-full space-x-6">
         <div>
           <h1 className="text-black dark:text-white text-xl font-semibold">
-            QuickPortfolio
+            qPortfolio
           </h1>
         </div>
         <div className="flex flex-row">
           <ThemeSwitch />
-          {session?.data?.user ?
-           (
+          {session?.user ? (
             <div className="flex items-center space-x-3 ml-3">
               <div className="hidden sm:flex items-center space-x-1">
                 <Image
                   src={
-                    session.data?.user.image
-                      ? session.data?.user.image
-                      : Default_Avatar
+                    session?.user.image ? session?.user.image : Default_Avatar
                   }
                   placeholder="blur"
                   alt="avatar"
@@ -50,24 +47,21 @@ const Navbar = () => {
                   width={50}
                 />
                 <span className="text-lg font-medium flex whitespace-nowrap text-black dark:text-white">
-                  Hey, {session.data?.user.name}
+                  Hey, {session?.user.name}
                 </span>
               </div>
-              <PrimaryButton
-                className="font-medium"
-                title="Logout"
-                onClick={handleLogout}
-              />
+              <LogoutButton />
             </div>
-          ) 
-          : session.status === "loading" ? <span className="text-lg p-2 font-medium dark:text-white text-black">Loading..</span>: (
+          ) : !session ? (
+            <span className="text-lg font-medium dark:text-white text-black">
+              Loading..
+            </span>
+          ) : (
             <>
-            <PrimaryButton 
-              title="Sign in"
-              onClick={() => router.push("/auth/signup")}
-              className="mr-2"
-            />
-            <SigninWGoogle />            
+              <Link href={"/auth/signin"}>
+                <PrimaryButton title="Sign in" className="mr-2" />
+              </Link>
+              <SigninWGoogle />
             </>
           )}
         </div>
@@ -76,4 +70,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default ServerNavbar
