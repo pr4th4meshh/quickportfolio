@@ -15,6 +15,15 @@ import {
 import { useParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Loading from "@/components/Loading"
+import ThemeSwitch from "@/components/ui/ThemeSwitch"
+import DefaultProfileImage from "../../../../public/qp_default_avatar.jpg"
+import PageHeader from "./_components/PageHeader"
+import PortfolioHero from "./_components/PortfolioHero"
+import PortfolioFooter from "./_components/PortfolioFooter"
+import PortfolioSkills from "./_components/PortfolioSkills"
+import PortfolioProjects from "./_components/PortfolioProjects"
+import { Animated3DCard } from "@/components/ui/3d-card"
+import PortfolioSocials from "./_components/PortfolioSocials"
 
 interface ProfileData {
   username: string
@@ -26,11 +35,17 @@ interface ProfileData {
     style: string
     aiGenerated: boolean
   }
-  socialLinks: {
-    twitter: string
-    linkedin: string
-    github: string
-  }
+  // socialMedia: {
+  //   twitter: string
+  //   linkedin: string
+  //   github: string
+  //   website: string
+  //   behance: string
+  //   figma: string
+  //   awwwards: string
+  //   dribbble: string
+  //   medium: string
+  // }
   projects: {
     title: string
     description: string
@@ -92,65 +107,68 @@ export default function Portfolio() {
     collaborators: ["team@example.com"],
   })
 
-  const params = useParams();
-  const [profileData0, setProfileData0] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const session = useSession();
+  const params = useParams()
+  const [profileData0, setProfileData0] = useState<ProfileData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const session = useSession()
+  console.log("SES", session)
 
   const handleGetPortfolioInformation = async () => {
     if (!session.data?.user?.id) {
-      console.error("User session not found.");
-      return;
+      console.error("User session not found.")
+      return
     }
 
     try {
       const response = await fetch(
         `/api/portfolio?portfolioId=${session.data.user.id}`
-      );
+      )
 
       if (!response.ok) {
-        throw new Error("Failed to fetch portfolio data.");
+        throw new Error("Failed to fetch portfolio data.")
       }
 
-      const data = await response.json();
+      const data = await response.json()
       if (data) {
-        setProfileData0(data); // Adjust this based on the API response structure
+        setProfileData0(data) // Adjust this based on the API response structure
       } else {
-        console.error("Portfolio fetch failed:", data.message);
+        console.error("Portfolio fetch failed:", data.message)
       }
     } catch (error) {
-      console.error("Error fetching portfolio data:", error);
+      console.error("Error fetching portfolio data:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
     if (session.status === "authenticated") {
-      handleGetPortfolioInformation();
+      handleGetPortfolioInformation()
     }
-  }, [session.status]);
+  }, [session.status])
 
   const handleEndorsement = (skillIndex: number) => {
-    if (!profileData0) return;
+    if (!profileData0) return
 
     setProfileData0((prev) => {
-      if (!prev) return null;
+      if (!prev) return null
 
-      const updatedSkills = [...prev.skills];
-      updatedSkills[skillIndex].endorsements += 1;
+      const updatedSkills = [...prev.skills]
+      updatedSkills[skillIndex].endorsements += 1
 
       return {
         ...prev,
         skills: updatedSkills,
-      };
-    });
-  };
+      }
+    })
+  }
 
   if (loading) {
-    return <div className="min-h-screen flex dark:bg-dark bg-light items-center justify-center">
-      <Loading />
-    </div>;
+    return (
+      <div className="min-h-screen flex dark:bg-dark bg-light items-center justify-center">
+        <Loading />
+      </div>
+    )
   }
 
   if (!profileData0) {
@@ -158,8 +176,10 @@ export default function Portfolio() {
       <div className="min-h-screen flex items-center justify-center">
         No profile data found.
       </div>
-    );
+    )
   }
+
+  console.log(profileData0, "profileData0")
   const backgroundStyle = {
     modern: `
       bg-gradient-to-r from-blue-100 via-blue-300 to-blue-500
@@ -206,178 +226,29 @@ export default function Portfolio() {
 
   return (
     // <div className={`min-h-screen ${backgroundStyle["bold"]} `}>
-    <div className="min-h-screen bg-black">
-      <div className="container max-w-4xl mx-auto p-4">
-        <div className="space-y-8">
-          {/* Analytics Banner */}
-          <section className="bg-primary text-primary-foreground p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <FiEye className="w-5 h-5" />
-                <span>{profileData.analytics.views} profile views</span>
-              </div>
-              <button
-                className="btn btn-secondary btn-sm"
-                // onClick={() => setShowAnalytics(!showAnalytics)}
-              >
-                <FiBarChart className="w-4 h-4 mr-2" />
-                View Analytics
-              </button>
-            </div>
-          </section>
+    <div className="min-h-screen dark:bg-black bg-light">
+      {/* Page Header / Navbar  */}
+      <PageHeader />
+      <div className="container mx-auto max-w-7xl">
+        {/* Profile Header */}
+        <PortfolioHero
+          session={session}
+          params={params}
+          profileData={profileData}
+          profileData0={profileData0}
+          handleEndorsement={handleEndorsement}
+        />
 
-          {/* Profile Header */}
-          <div className="text-center space-y-4">
-            <div className="relative inline-block">
-              {/* <Image
-                src={session.data?.user.image ? session.data?.user.image : ""}
-                alt={profileData.name}
-                width={200}
-                height={200}
-                className="rounded-full border-4 border-background"
-              /> */}
-              <button
-                className="absolute bottom-0 right-0 rounded-full p-2 bg-transparent border-2 border-primary"
-                aria-label="Edit Profile"
-              >
-                <FiEdit className="w-4 h-4" />
-              </button>
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold">{params.portfolioUsername}</h1>
-              <p className="text-xl text-muted-foreground">
-                {profileData0?.profession}
-              </p>
-            </div>
-            <p className="text-lg max-w-2xl mx-auto">
-              {profileData0?.headline}
-            </p>
-            <div className="flex justify-center gap-4">
-              {profileData.socialLinks.twitter && (
-                <Link href={profileData.socialLinks.twitter} target="_blank">
-                  {/* <a className="btn btn-ghost p-2 rounded-full"> */}
-                  <FaTwitter className="w-5 h-5" />
-                  {/* </a> */}
-                </Link>
-              )}
-              {profileData.socialLinks.linkedin && (
-                <Link href={profileData.socialLinks.linkedin} target="_blank">
-                  {/* <a className="btn btn-ghost p-2 rounded-full"> */}
-                  <FaLinkedin className="w-5 h-5" />
-                  {/* </a> */}
-                </Link>
-              )}
-              {profileData.socialLinks.github && (
-                <Link href={profileData.socialLinks.github} target="_blank">
-                  {/* <a className="btn btn-ghost p-2 rounded-full"> */}
-                  <FaGithub className="w-5 h-5" />
-                  {/* </a> */}
-                </Link>
-              )}
-            </div>
-          </div>
+        {/* Skills Section */}
+        <PortfolioSkills skillsAndFeatures={profileData0.features} />
 
-          {/* Skills Section */}
-          <section>
-            <header>
-              <h2 className="text-xl font-semibold">Skills & Endorsements</h2>
-            </header>
-            <div className="flex flex-wrap gap-4">
-              {profileData.skills.map((skill, index) => (
-                <button
-                  key={index}
-                  className="btn btn-outline flex items-center gap-2"
-                  onClick={() => handleEndorsement(index)}
-                >
-                  {skill.name}
-                  <span className="bg-muted px-2 py-0.5 rounded-full text-sm">
-                    {skill.endorsements}
-                  </span>
-                  <FiThumbsUp className="w-4 h-4" />
-                </button>
-              ))}
-            </div>
-          </section>
+        <PortfolioSocials socialMediaLinks={profileData0.socialMedia} />
 
-          {/* Projects Timeline */}
-          <section>
-            <header>
-              <h2 className="text-xl font-semibold">Project Timeline</h2>
-            </header>
-            <div className="space-y-8">
-              {profileData.projects.map((project, index) => (
-                <div
-                  key={index}
-                  className="relative pl-8 pb-8 border-l-2 border-muted last:pb-0"
-                >
-                  <div className="absolute left-0 transform -translate-x-1/2 mt-2">
-                    <div className="w-4 h-4 rounded-full bg-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">{project.title}</h3>
-                      <Link href={project.link} target="_blank">
-                        {/* <a className="btn btn-ghost p-2 rounded-full"> */}
-                        <FiExternalLink className="w-4 h-4" />
-                        {/* </a> */}
-                      </Link>
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <FiClock className="w-4 h-4 mr-2" />
-                      {new Date(project.timeline).toLocaleDateString()}
-                    </div>
-                    <p className="text-muted-foreground">
-                      {project.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+        {/* Projects Timeline */}
+        <PortfolioProjects projects={profileData0.projects} />
 
-          {/* Achievements */}
-          <section>
-            <header>
-              <h2 className="text-xl font-semibold">Achievements</h2>
-            </header>
-            <div className="grid gap-4">
-              {profileData.achievements.map((achievement, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-4 p-4 bg-muted rounded-lg"
-                >
-                  <FiBarChart className="w-8 h-8 text-primary" />
-                  <div>
-                    <h3 className="font-semibold">{achievement.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {achievement.issuer} •{" "}
-                      {new Date(achievement.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Team Collaboration */}
-          {profileData.collaborators.length > 0 && (
-            <section>
-              <header>
-                <h2 className="text-xl font-semibold">Team Members</h2>
-              </header>
-              <div className="flex flex-wrap gap-2">
-                {profileData.collaborators.map((email, index) => (
-                  <div
-                    key={index}
-                    className="bg-muted px-3 py-1 rounded-full text-sm"
-                  >
-                    {email}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
+        {/* Portfolio Footer */}
+        <PortfolioFooter />
       </div>
     </div>
   )

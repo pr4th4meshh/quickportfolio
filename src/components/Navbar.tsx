@@ -44,6 +44,7 @@ const Navbar = () => {
                       : Default_Avatar
                   }
                   placeholder="blur"
+                  blurDataURL={session.data?.user.image}
                   alt="avatar"
                   className="w-[40px] h-[40px] mr-1 rounded-full object-contain"
                   height={50}

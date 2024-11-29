@@ -15,7 +15,7 @@ export default function ThemeSwitch() {
   if (resolvedTheme === "dark") {
     return (
       <button
-        className=" dark:text-white text-2xl p-2"
+        className=" dark:text-white text-3xl p-2"
         onClick={() => setTheme("light")}
       >
         <IoSunnyOutline />
@@ -26,7 +26,7 @@ export default function ThemeSwitch() {
   if (resolvedTheme === "light") {
     return (
       <button
-        className=" dark:text-white text-2xl p-2"
+        className=" dark:text-white text-3xl p-2"
         onClick={() => setTheme("dark")}
       >
         <IoMoonOutline />

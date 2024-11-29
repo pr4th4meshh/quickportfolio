@@ -53,18 +53,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-        // Checking for missing required fields
-        if (!fullName || !profession || !features || !projects) {
-          return NextResponse.json(
-            { message: "Missing required fields" },
-            { status: 400 }
-          )
-        }
+    // Checking for missing required fields
+    if (!fullName || !profession || !features || !projects) {
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      )
+    }
 
     const existingPortfolio = await prisma.portfolio.findUnique({
       where: {
         userId: session?.user?.id,
-      }
+      },
     })
 
     if (existingPortfolio) {
@@ -123,28 +123,27 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Missing userId" }, { status: 400 })
     }
 
-    // const findUser = await prisma.user.findFirst({
-    //   where: {
-    //     name: portfolioUsername,
-    //   },
-    // })
-
-    // console.log("userId", findUser);
-
-    // if (!findUser) {
-    //   return NextResponse.json(
-    //     { message: "User Id not found" },
-    //     { status: 404 }
-    //   )
-    // }
-
     const portfolio = await prisma.portfolio.findFirst({
       where: {
         userId: portfolioUsername,
       },
       include: {
         projects: true,
-        socialMedia: true,
+        socialMedia: {
+          select: {
+            twitter: true,
+            linkedin: true,
+            github: true,
+            instagram: true,
+            youtube: true,
+            medium: true,
+            website: true,
+            behance: true,
+            figma: true,
+            awwwards: true,
+            dribbble: true,
+          },
+        },
       },
     })
 
