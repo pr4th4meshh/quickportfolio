@@ -1,61 +1,83 @@
-import { CardContainer, CardBody, CardItem } from '@/components/ui/3d-card';
-import Link from 'next/link';
-import React from 'react';
+import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card"
+import Link from "next/link"
+import React from "react"
+import {
+  FaTwitter,
+  FaDribbble,
+  FaGithub,
+  FaInstagram,
+  FaYoutube,
+  FaMedium,
+  FaGlobe,
+  FaLinkedin,
+  FaBehance,
+  FaFigma,
+} from "react-icons/fa6"
+import { FaProjectDiagram } from "react-icons/fa"
 
-const PortfolioSocials = ({ socialMediaLinks }) => {
-  // Convert the socialLinks object into an array of entries (key-value pairs)
-  const socialMediaArray = Object.entries(socialMediaLinks)
-    // Filter out entries where the URL is null or undefined
-    .filter(([platform, url]) => url !== null && url !== undefined);
+const PortfolioSocials = ({ socialMediaLinks }: any) => {
+  const socialMediaArray = Object.entries(socialMediaLinks).filter(
+    ([platform, url]) => url !== null && url !== undefined
+  )
 
   return (
-    <div className='grid grid-cols-3'>
+    <div className="grid sm:grid-cols-6 grid-cols-2 gap-6 py-20">
       {socialMediaArray.length === 0 ? (
-        <div>No social media links available.</div> // Handle case when no valid links exist
+        <h1 className="text-center col-span-full">
+          No social media links available.
+        </h1>
       ) : (
-        socialMediaArray.map(([platform, url], index) => (
-          <CardContainer className="inter-var" key={index}>
-            <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl p-6 border">
-              <CardItem
-                translateZ="50"
-                className="text-xl font-bold text-neutral-600 dark:text-white"
-              >
-                {platform} Social
-              </CardItem>
-              <CardItem
-                as="p"
-                translateZ="60"
-                className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
-              >
-                Connect with me on {platform}.
-              </CardItem>
-              <CardItem translateZ="100" className="w-full mt-4">
-                <h1>{platform}</h1>
-              </CardItem>
-              <div className="flex justify-between items-center mt-20">
-                <CardItem
-                  translateZ={20}
-                  as={Link}
-                  href={url}
-                  target="__blank"
-                  className="px-4 py-2 rounded-xl text-xs font-normal dark:text-white"
-                >
-                  Try now →
+        socialMediaArray.map(([platform, url]: any, index) => (
+          <Link
+            href={{
+              pathname: url,
+            }}
+            target="_blank"
+          >
+            <CardContainer
+              key={index}
+              className="inter-var w-[150px] max-w-[150px] cursor-pointer"
+            >
+              <CardBody className="flex flex-col justify-center items-center relative group/card bg-gray-50 dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-full rounded-xl p-6 border">
+                <CardItem translateZ="250">
+                  <span className="flex items-center justify-center">
+                    {platform === "twitter" ? (
+                      <FaTwitter className="text-5xl" />
+                    ) : platform === "dribbble" ? (
+                      <FaDribbble className="text-5xl" />
+                    ) : platform === "github" ? (
+                      <FaGithub className="text-5xl" />
+                    ) : platform === "instagram" ? (
+                      <FaInstagram className="text-5xl" />
+                    ) : platform === "youtube" ? (
+                      <FaYoutube className="text-5xl" />
+                    ) : platform === "medium" ? (
+                      <FaMedium className="text-5xl" />
+                    ) : platform === "website" ? (
+                      <FaGlobe className="text-5xl" />
+                    ) : platform === "linkedin" ? (
+                      <FaLinkedin className="text-5xl" />
+                    ) : platform === "behance" ? (
+                      <FaBehance className="text-5xl" />
+                    ) : platform === "figma" ? (
+                      <FaFigma className="text-5xl" />
+                    ) : platform === "awwwards" ? (
+                      <FaProjectDiagram className="text-5xl" />
+                    ) : null}
+                  </span>
                 </CardItem>
-                <CardItem
-                  translateZ={20}
-                  as="button"
-                  className="px-4 py-2 rounded-xl bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
-                >
-                  Sign up
+                <CardItem translateZ="100" className="w-full mt-2">
+                  <h1 className="text-center text-sm font-medium">
+                    {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                  </h1>
                 </CardItem>
-              </div>
-            </CardBody>
-          </CardContainer>
+              </CardBody>
+            </CardContainer>
+          </Link>
         ))
       )}
     </div>
-  );
-};
+  )
+}
 
-export default PortfolioSocials;
+export default PortfolioSocials
