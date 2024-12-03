@@ -161,7 +161,6 @@ export async function GET(req: Request) {
 }
 
 // update portfolio route:
-
 export async function PUT(req: Request) {
   try {
     const session = await getServerSession(authOptions)
@@ -170,46 +169,71 @@ export async function PUT(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
-    const {
-      fullName,
-      profession,
-      headline,
-      theme,
-      features,
-      projects,
-      socialLinks,
-    } = await req.json()
+    const url = new URL(req.url)
+    const portfolioUsername = url.searchParams.get("portfolioUsername")
 
-    if (!fullName || !profession || !features || !projects) {
+    if (!portfolioUsername) {
+      return NextResponse.json({ message: "Missing portfolioUsername" }, { status: 400 })
+    }
+
+    const updateData = await req.json()
+
+    // Find the portfolio by username
+    const existingPortfolio = await prisma.portfolio.findUnique({
+      where: { username: portfolioUsername },
+      include: { User: true },
+    })
+
+    if (!existingPortfolio) {
       return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
+        { message: "Portfolio not found" },
+        { status: 404 }
       )
+    }
+
+    // Check if the logged-in user is the owner of the portfolio
+    if (existingPortfolio.User.id !== session.user.id) {
+      return NextResponse.json(
+        { message: "You are not authorized to update this portfolio" },
+        { status: 403 }
+      )
+    }
+
+    // Prepare the update data
+    const portfolioUpdate: any = {}
+
+    // Update basic fields if provided
+    if (updateData.fullName) portfolioUpdate.fullName = updateData.fullName
+    if (updateData.profession) portfolioUpdate.profession = updateData.profession
+    if (updateData.headline) portfolioUpdate.headline = updateData.headline
+    if (updateData.theme) portfolioUpdate.theme = updateData.theme
+    if (updateData.features) portfolioUpdate.features = updateData.features
+
+    // Update projects if provided
+    if (updateData.projects) {
+      portfolioUpdate.projects = {
+        deleteMany: {},
+        create: updateData.projects.map((project: any) => ({
+          title: project.title,
+          description: project.description,
+          link: project.link || "",
+          timeline: project.timeline || "",
+        })),
+      }
+    }
+
+    // Update social links if provided
+    if (updateData.socialLinks) {
+      portfolioUpdate.socialMedia = {
+        update: updateData.socialLinks
+      }
     }
 
     const updatedPortfolio = await prisma.portfolio.update({
       where: {
-        userId: session.user.id,
+        username: portfolioUsername,
       },
-      data: {
-        fullName,
-        profession,
-        headline,
-        theme: theme || "modern",
-        features,
-        projects: {
-          deleteMany: {},
-          create: projects.map((project: any) => ({
-            title: project.title,
-            description: project.description,
-            link: project.link || "",
-            timeline: project.timeline || "",
-          })),
-        },
-        socialMedia: {
-          update: socialLinks,
-        },
-      },
+      data: portfolioUpdate,
       include: {
         socialMedia: true,
         projects: true,
@@ -220,7 +244,7 @@ export async function PUT(req: Request) {
   } catch (error) {
     console.error("Error updating portfolio:", error)
     return NextResponse.json(
-      { message: "Internal server error" },
+      { message: "Internal server error", error: (error as Error).message },
       { status: 500 }
     )
   }
