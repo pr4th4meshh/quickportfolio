@@ -25,7 +25,6 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         jwt: async ({ token }) => {
-            console.log("JWT Callback: token:", token);
             const db_user = await prisma.user.findFirst({
                 where: {
                     email: token.email

@@ -8,7 +8,6 @@ import ThemeSwitch from "./ui/ThemeSwitch"
 import { signIn, signOut, useSession } from "next-auth/react"
 import SigninWGoogle from "./SigninWGoogle"
 import { useRouter } from "next/navigation"
-
 interface User {
   id: string
   username: string
@@ -27,8 +26,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6 shadow-md">
       <div className="flex items-center justify-between mx-auto w-min sm:w-[50vw] border-[#404040] border-2 py-4 sm:py-4 px-6 sm:px-8 rounded-full space-x-6">
         <div>
-          <h1 className="text-black dark:text-white text-xl font-semibold">
-            QuickPortfolio
+          <h1 className="text-black dark:text-white text-xl font-bold">
+            Presssence
           </h1>
         </div>
         <div className="flex flex-row">

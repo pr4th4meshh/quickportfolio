@@ -10,6 +10,8 @@ import PortfolioFooter from "./_components/PortfolioFooter"
 import PortfolioSkills from "./_components/PortfolioSkills"
 import PortfolioProjects from "./_components/PortfolioProjects"
 import PortfolioSocials from "./_components/PortfolioSocials"
+import Link from "next/link"
+import CTAComponent from "./_components/CTAComponent"
 
 interface ProfileData {
   username: string
@@ -124,7 +126,7 @@ export default function Portfolio() {
   }
 
   useEffect(() => {
-      handleGetPortfolioInformation()
+    handleGetPortfolioInformation()
   }, [])
 
   const handleEndorsement = (skillIndex: number) => {
@@ -207,6 +209,8 @@ export default function Portfolio() {
   return (
     // <div className={`min-h-screen ${backgroundStyle["bold"]} `}>
     <div className="min-h-screen dark:bg-black bg-light">
+      {/* Call to action component on the right to create new portfolio/pressence  */}
+      <CTAComponent />
       {/* Page Header / Navbar  */}
       <PageHeader />
       <div className="container mx-auto max-w-7xl">
@@ -220,12 +224,12 @@ export default function Portfolio() {
         />
 
         {/* Skills Section */}
-        <PortfolioSkills skillsAndFeatures={profileData0.features} />
+        <PortfolioSkills skillsAndFeatures={profileData0} />
 
-        <PortfolioSocials socialMediaLinks={profileData0.socialMedia} />
+        <PortfolioSocials socialMediaLinksViaPortfolio={profileData0} />
 
         {/* Projects Timeline */}
-        <PortfolioProjects projects={profileData0.projects} />
+        <PortfolioProjects initialProjects={profileData0} />
 
         {/* Portfolio Footer */}
         <PortfolioFooter />
