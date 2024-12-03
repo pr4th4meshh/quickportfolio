@@ -1,28 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa"
-import {
-  FiEdit,
-  FiThumbsUp,
-  FiEye,
-  FiClock,
-  FiBarChart,
-  FiExternalLink,
-} from "react-icons/fi"
 import { useParams } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Loading from "@/components/Loading"
-import ThemeSwitch from "@/components/ui/ThemeSwitch"
-import DefaultProfileImage from "../../../../public/qp_default_avatar.jpg"
 import PageHeader from "./_components/PageHeader"
 import PortfolioHero from "./_components/PortfolioHero"
 import PortfolioFooter from "./_components/PortfolioFooter"
 import PortfolioSkills from "./_components/PortfolioSkills"
 import PortfolioProjects from "./_components/PortfolioProjects"
-import { Animated3DCard } from "@/components/ui/3d-card"
 import PortfolioSocials from "./_components/PortfolioSocials"
 
 interface ProfileData {
@@ -114,14 +100,10 @@ export default function Portfolio() {
   console.log("SES", session)
 
   const handleGetPortfolioInformation = async () => {
-    if (!session.data?.user?.id) {
-      console.error("User session not found.")
-      return
-    }
-
     try {
+      setLoading(true)
       const response = await fetch(
-        `/api/portfolio?portfolioId=${session.data.user.id}`
+        `/api/portfolio?portfolioUsername=${params.portfolioUsername}`
       )
 
       if (!response.ok) {
@@ -130,7 +112,7 @@ export default function Portfolio() {
 
       const data = await response.json()
       if (data) {
-        setProfileData0(data) // Adjust this based on the API response structure
+        setProfileData0(data)
       } else {
         console.error("Portfolio fetch failed:", data.message)
       }
@@ -142,10 +124,8 @@ export default function Portfolio() {
   }
 
   useEffect(() => {
-    if (session.status === "authenticated") {
       handleGetPortfolioInformation()
-    }
-  }, [session.status])
+  }, [])
 
   const handleEndorsement = (skillIndex: number) => {
     if (!profileData0) return

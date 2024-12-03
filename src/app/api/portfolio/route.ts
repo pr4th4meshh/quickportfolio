@@ -117,15 +117,15 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
-    const portfolioUsername = url.searchParams.get("portfolioId")
+    const portfolioUsername = url.searchParams.get("portfolioUsername")
 
     if (!portfolioUsername) {
-      return NextResponse.json({ message: "Missing userId" }, { status: 400 })
+      return NextResponse.json({ message: "Missing porfolio username" }, { status: 400 })
     }
 
     const portfolio = await prisma.portfolio.findFirst({
       where: {
-        userId: portfolioUsername,
+        username: portfolioUsername,
       },
       include: {
         projects: true,
