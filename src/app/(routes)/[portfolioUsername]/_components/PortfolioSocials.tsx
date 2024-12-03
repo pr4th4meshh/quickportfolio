@@ -20,14 +20,19 @@ import PrimaryButton from "@/components/ui/primary-button"
 import EditButton from "./EditButton"
 import { GlareCard } from "@/components/ui/glare-card"
 
-const PortfolioSocials = ({socialMediaLinksViaPortfolio} :any ) => {
+const PortfolioSocials = ({ socialMediaLinksViaPortfolio }: any) => {
   const [isEditing, setIsEditing] = useState(false)
-  const [socialMediaLinks, setSocialMediaLinks] = useState(socialMediaLinksViaPortfolio.socialMedia)
+  const [socialMediaLinks, setSocialMediaLinks] = useState(
+    socialMediaLinksViaPortfolio.socialMedia
+  )
   const { data: session } = useSession()
   const params = useParams()
 
   const handleInputChange = (platform: string, value: string) => {
-    setSocialMediaLinks((prev: object | any) => ({ ...prev, [platform]: value }))
+    setSocialMediaLinks((prev: object | any) => ({
+      ...prev,
+      [platform]: value,
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -131,14 +136,15 @@ const PortfolioSocials = ({socialMediaLinksViaPortfolio} :any ) => {
                 // </CardContainer>
                 <div key={index}>
                   <Link href={url} target="_blank" rel="noopener noreferrer">
-                  <GlareCard className=" flex  justify-center items-center">
-                      <div>
-                         <span className="flex items-center justify-center">
-                           {React.createElement(socialIcons[platform] || FaExternalLinkAlt, { className: "text-5xl" })}
-                         </span>
-                      </div>
-                </GlareCard>
-                </Link>
+                    <GlareCard className=" flex flex-col justify-center items-center dark:bg-black-900 bg-black-500">
+                      <span className="flex items-center justify-center dark:text-white text-black">
+                        {React.createElement(
+                          socialIcons[platform] || FaExternalLinkAlt,
+                          { className: "text-5xl" }
+                        )}
+                      </span>
+                    </GlareCard>
+                  </Link>
                 </div>
               ))
             )}
