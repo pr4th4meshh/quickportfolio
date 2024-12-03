@@ -2,8 +2,8 @@ import { Metadata } from "next"
 import localFont from "next/font/local"
 import "./globals.css"
 import { NextAuthSessionProvider, Providers } from "./providers"
-import ServerNavbar from "@/components/ServerNav"
 
+// testing commits because changed the repo name
 const poppins = localFont({
   src: [
     {
