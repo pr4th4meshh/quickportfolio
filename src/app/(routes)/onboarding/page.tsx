@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -27,21 +27,17 @@ import { BiLeftArrowAlt } from "react-icons/bi"
 import { useRouter } from "next/navigation"
 import { formSchema, FormData } from "@/lib/zod"
 import { CustomTagsInput } from "@/components/CustomTagsInput"
-import { useSession } from "next-auth/react"
+import { PiSpinner } from "react-icons/pi";
+import { useDebounce } from "@/hooks/useDebounce"
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
-  const [aiGeneratedColors, setAiGeneratedColors] = useState({
-    primary: "#3b82f6",
-    secondary: "#10b981",
-    background: "#ffffff",
-    text: "#1f2937",
-  })
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(true)
+  const [checkingUsernameLoading, setCheckingUsernameLoading] = useState(false)
 
   const router = useRouter()
-  const session = useSession()
 
   const {
     register,
@@ -106,6 +102,45 @@ export default function OnboardingForm() {
     name: "projects",
   })
 
+  const checkingUsername = watch("username")
+  const debouncedValue = useDebounce(checkingUsername)
+
+  const checkUsernameAvailability = async (username: string) => {
+    if (!username) {
+      setIsUsernameAvailable(true);
+      return;
+    }      
+  
+    try {
+    if(username.length > 2) {
+      setCheckingUsernameLoading(true)
+      const res = await fetch('/api/checkUsername', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+      });
+  
+      const data = await res.json();
+      if (res.ok) {
+        setIsUsernameAvailable(data.available);
+      } else {
+        setIsUsernameAvailable(true);
+      }
+    }
+    } catch (error) {
+      console.error(error);
+      setIsUsernameAvailable(false);
+    } finally {
+      setCheckingUsernameLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkUsernameAvailability(debouncedValue);
+  }, [debouncedValue]);
+  
   return (
     <WavyBackground>
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -128,17 +163,23 @@ export default function OnboardingForm() {
             {step === 1 && (
               <div>
                 <div className="space-y-2">
+                  <div className="flex justify-between">
                   <label
                     htmlFor="username"
                     className="block text-sm font-medium"
                   >
                     Choose your username
                   </label>
+                  {checkingUsernameLoading && <p className="text-sm text-gray-500"><PiSpinner className="animate-spin text-xl dark:text-white text-black" /></p>}
+                  {!checkingUsernameLoading && isUsernameAvailable && checkingUsername?.length > 2 && <p className="text-sm text-green-500">Username available!</p>}
+                  {!checkingUsernameLoading && !isUsernameAvailable && <p className="text-sm text-red-500">Username unavailable or already taken</p>}
+                  </div>
                   <input
                     id="username"
-                    placeholder="yourname"
+                    placeholder="Choose your username"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     {...register("username")}
+                    onChange={(e) => setValue("username", e.target.value.toLowerCase())}
                   />
                   {errors.username && (
                     <p className="text-sm text-red-500">
@@ -146,7 +187,7 @@ export default function OnboardingForm() {
                     </p>
                   )}
                   <p className="text-sm text-gray-500">
-                    This will be your profile URL: quickportfolio.com/
+                    This will be your profile URL: presssence.me/
                     {watch("username") || "yourname"}
                   </p>
                 </div>
@@ -245,6 +286,7 @@ export default function OnboardingForm() {
                     id="theme"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     {...register("theme")}
+                    disabled
                   >
                     <option value="modern">Modern Minimal</option>
                     <option value="creative">Creative</option>
@@ -255,7 +297,7 @@ export default function OnboardingForm() {
                     type="button"
                     className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md dark:bg-black bg-white focus:outline-none"
                     onClick={() => null}
-                    disabled={isLoading}
+                    disabled
                   >
                     <FaPalette className="text-xl mr-2" />
                     {isLoading ? "Generating..." : "Generate AI Color Scheme"}
@@ -276,6 +318,7 @@ export default function OnboardingForm() {
                       onClick={() =>
                         setValue("analyticsEnabled", !watch("analyticsEnabled"))
                       }
+                      disabled
                     >
                       <FaChartBar className="text-xl mr-2" />
                       Analytics
@@ -290,6 +333,7 @@ export default function OnboardingForm() {
                       onClick={() =>
                         setValue("blogEnabled", !watch("blogEnabled"))
                       }
+                      disabled
                     >
                       <FaBook className="text-xl mr-2" />
                       Blog

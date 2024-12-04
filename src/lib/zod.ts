@@ -27,7 +27,7 @@ export type FormFields = z.infer<typeof SignupSchemaFrontend>
 export type LoginFields = z.infer<typeof LoginSchemaFrontend>
 
 export const formSchema = z.object({
-  username: z.string().min(3).max(20).regex(/^\S*$/, "Spaces are not allowed"),
+  username: z.string().min(3).max(20).regex(/^[a-z0-9_]+$/, "Username can only contain lowercase letters, numbers, and underscores").toLowerCase(),
   fullName: z.string().min(2).max(50),
   profession: z.string().min(2).max(50),
   headline: z.string().max(160),
