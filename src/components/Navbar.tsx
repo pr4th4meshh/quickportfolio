@@ -1,23 +1,17 @@
 "use client"
 import React from "react"
-import DarkModeToggle from "./DarkModeToggle"
 import PrimaryButton from "./ui/primary-button"
 import Image from "next/image"
 import Default_Avatar from "../../public/qp_default_avatar.jpg"
 import ThemeSwitch from "./ui/ThemeSwitch"
-import { signIn, signOut, useSession } from "next-auth/react"
-import SigninWGoogle from "./SigninWGoogle"
+import { signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-interface User {
-  id: string
-  username: string
-}
 
 const Navbar = () => {
   const router = useRouter()
   const session = useSession()
   const handleLogout = () => {
-    signOut({callbackUrl: '/'})
+    signOut({ callbackUrl: "/" })
   }
 
   console.log(session)
@@ -32,8 +26,7 @@ const Navbar = () => {
         </div>
         <div className="flex flex-row">
           <ThemeSwitch />
-          {session?.data?.user ?
-           (
+          {session?.data?.user ? (
             <div className="flex items-center space-x-3 ml-3">
               <div className="hidden sm:flex items-center space-x-1">
                 <Image
@@ -59,16 +52,16 @@ const Navbar = () => {
                 onClick={handleLogout}
               />
             </div>
-          ) 
-          : session.status === "loading" ? <span className="text-lg p-2 font-medium dark:text-white text-black">Loading..</span>: (
-            <>
-            <PrimaryButton 
-              title="Sign in"
+          ) : session.status === "loading" ? (
+            <span className="text-lg p-2 font-medium dark:text-white text-black">
+              Loading..
+            </span>
+          ) : (
+            <PrimaryButton
+              title="Sign In"
               onClick={() => router.push("/auth/signup")}
-              className="mr-2"
+              className="mr-2 min-w-fit"
             />
-            <SigninWGoogle />            
-            </>
           )}
         </div>
       </div>

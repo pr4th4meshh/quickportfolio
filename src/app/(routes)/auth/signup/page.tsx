@@ -1,5 +1,6 @@
 "use client"
 import { registerUser } from "@/actions/registerUser"
+import SigninWGoogle from "@/components/SigninWGoogle"
 import BorderStyleButton from "@/components/ui/border-button"
 import { FormFields, SignupSchemaFrontend } from "@/lib/zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -7,13 +8,12 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
+import { PiSpinner } from "react-icons/pi"
 
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("")
   const {
     handleSubmit,
-    setError,
-    reset,
     register,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
@@ -43,7 +43,7 @@ const SignUp = () => {
     <div className="flex justify-center items-center h-screen dark:bg-dark bg-light">
       <div className="w-full max-w-sm p-10 border border-gray-500 shadow-sm shadow-white rounded-lg">
         <h1 className="text-center text-2xl font-semibold mb-6">
-          Sign Up to QPortfolio
+          Sign Up to Presssence
         </h1>
 
         <form
@@ -99,11 +99,12 @@ const SignUp = () => {
           </div>
 
           <BorderStyleButton
-            title={isSubmitting ? "Submitting..." : "Sign Up"}
+                       title={isSubmitting ? (<PiSpinner className="animate-spin text-xl dark:text-white text-black" />) : "Sign Up"}
             type="submit"
             disabled={isSubmitting}
           />
         </form>
+        <SigninWGoogle className="w-full mt-2 text-md" />
         <h1 className="text-center pt-2 text-md text-red-500">
           {errorMessage}
         </h1>

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 import React from "react"
 
 interface BorderStyleButtonProps {
-  title: string
+  title: string | React.ReactNode
   onClick?: () => void
   className?: string
   disabled?: boolean

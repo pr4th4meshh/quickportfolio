@@ -4,13 +4,15 @@ import { FlipWords } from "./ui/flip-words"
 import BorderStyleButton from "./ui/border-button"
 import { IoLogoGithub, IoLogoLinkedin, IoLogoTwitter } from "react-icons/io"
 import { FloatingDock } from "./ui/floating-dock"
-import { IoLogoInstagram } from "react-icons/io5"
+import { RxCross1 } from "react-icons/rx"
 import { FaUpwork } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Navbar from "./Navbar"
 import { useEffect, useState } from "react"
 import { BiGlobe } from "react-icons/bi"
+import PrimaryButton from "./ui/primary-button"
+import SignupModal from "./SignupModal"
 
 interface Portfolio {
   username: string
@@ -32,6 +34,7 @@ interface User {
 
 export default function Hero() {
   const [user, setUser] = useState<User | null>(null)
+  const [showSignUpPrompt, setShowSignUpPrompt] = useState(false)
   const router = useRouter()
   const words = ["easy", "quick", "beautiful", "modern"]
   const links = [
@@ -104,6 +107,18 @@ export default function Hero() {
   }, [session.status])
 
   console.log("USER", user)
+
+  const handleCreatePortfolio = () => {
+    if (session.status === "authenticated") {
+      if (user?.portfolio) {
+        router.push(`/${user.portfolio.username}`)
+      } else {
+        router.push("/onboarding")
+      }
+    } else {
+      setShowSignUpPrompt(true)
+    }
+  }
   return (
     <WavyBackground>
       <Navbar />
@@ -120,12 +135,8 @@ export default function Hero() {
 
           {
             <BorderStyleButton
-              title="Create your qPortfolio"
-              onClick={() =>
-                user?.portfolio
-                  ? router.push(`/${user.portfolio.username}`)
-                  : router.push("/onboarding")
-              }
+              title="Create your Presssence"
+              onClick={handleCreatePortfolio}
               className="mt-20 w-[300px] flex self-center text-2xl items-center"
             />
           }
@@ -136,6 +147,10 @@ export default function Hero() {
           items={links}
         />
       </div>
+
+      {showSignUpPrompt && (
+        <SignupModal signUpPromptState={setShowSignUpPrompt} />
+      )}
     </WavyBackground>
   )
 }

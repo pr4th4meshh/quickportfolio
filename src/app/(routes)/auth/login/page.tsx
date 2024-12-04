@@ -5,17 +5,16 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { FormFields, LoginFields, LoginSchemaFrontend } from "@/lib/zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import email from "next-auth/providers/email"
 import { useForm } from "react-hook-form"
 import Link from "next/link"
 import BorderStyleButton from "@/components/ui/border-button"
+import SigninWGoogle from "@/components/SigninWGoogle"
+import { PiSpinner } from "react-icons/pi"
 
 export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState("")
   const {
     handleSubmit,
-    setError,
-    reset,
     register,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
@@ -44,7 +43,7 @@ export default function LoginForm() {
     <div className="flex justify-center items-center h-screen dark:bg-black bg-light">
       <div className="w-full max-w-sm p-10 border border-gray-500 shadow-sm shadow-white rounded-lg">
         <h1 className="text-center text-2xl font-semibold mb-6">
-          Login to QPortfolio
+          Login to Presssence
         </h1>
 
         <form
@@ -52,7 +51,7 @@ export default function LoginForm() {
           onSubmit={handleSubmit(handleOnSubmit)}
         >
           <div>
-            <label htmlFor="email" className="block text-sm font-medium">
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
               Enter email
             </label>
             <input
@@ -68,7 +67,7 @@ export default function LoginForm() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium">
+            <label htmlFor="password" className="block text-sm font-medium mb-1">
               Enter password
             </label>
             <input
@@ -84,12 +83,13 @@ export default function LoginForm() {
           </div>
 
           <BorderStyleButton
-            title={isSubmitting ? "Submitting..." : "Login"}
+            title={isSubmitting ? (<PiSpinner className="animate-spin text-xl dark:text-white text-black" />) : "Login"}
             type="submit"
             disabled={isSubmitting}
           />
-          
         </form>
+        
+        <SigninWGoogle className="w-full mt-2 text-md" />
         <h1 className="text-center pt-2 text-md text-red-500">
           {errorMessage}
         </h1>
