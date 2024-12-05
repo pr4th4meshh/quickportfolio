@@ -50,7 +50,8 @@ const PortfolioSkills = ({ skillsAndFeatures }: any) => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-20">
+    skills.length > 0 && (
+      <div className="container mx-auto px-4 py-20">
       {isEditing ? (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex items-center space-x-2">
@@ -114,6 +115,7 @@ const PortfolioSkills = ({ skillsAndFeatures }: any) => {
         </div>
       )}
     </div>
+    )
   )
 }
 

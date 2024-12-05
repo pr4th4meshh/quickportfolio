@@ -1,4 +1,3 @@
-import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card"
 import Link from "next/link"
 import React, { useState } from "react"
 import { useSession } from "next-auth/react"
@@ -79,86 +78,68 @@ const PortfolioSocials = ({ socialMediaLinksViaPortfolio }: any) => {
     awwwards: FaProjectDiagram,
   }
 
-  return (
+  return ( 
+  socialMediaArray.length > 0 && (
     <div className="py-20 container mx-auto px-4">
-      <h1 className="text-center pb-10 text-3xl uppercase">Socials</h1>
+    <h1 className="text-center pb-10 text-3xl uppercase">Socials</h1>
 
-      {isEditing ? (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {Object.keys(socialMediaLinks).map((platform) => (
-            <div key={platform} className="flex items-center space-x-2">
-              <label htmlFor={platform} className="w-24 text-right capitalize">
-                {platform}:
-              </label>
-              <input
-                type="url"
-                id={platform}
-                value={socialMediaLinks[platform] || ""}
-                onChange={(e) => handleInputChange(platform, e.target.value)}
-                placeholder={`Enter ${platform} URL`}
-                className="flex-grow p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-          ))}
-          <div className="flex justify-end space-x-2">
-            <PrimaryButton
-              title="Cancel"
-              onClick={() => setIsEditing(false)}
-              className="bg-red-500 text-white"
+    {isEditing ? (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {Object.keys(socialMediaLinks).map((platform) => (
+          <div key={platform} className="flex items-center space-x-2">
+            <label htmlFor={platform} className="w-24 text-right capitalize">
+              {platform}:
+            </label>
+            <input
+              type="url"
+              id={platform}
+              value={socialMediaLinks[platform] || ""}
+              onChange={(e) => handleInputChange(platform, e.target.value)}
+              placeholder={`Enter ${platform} URL`}
+              className="flex-grow p-2 border border-gray-300 rounded-md"
             />
-            <PrimaryButton title="Save Changes" type="submit" />
           </div>
-        </form>
-      ) : (
-        <div className="relative">
-          <div className="grid sm:grid-cols-6 grid-cols-2 gap-6">
-            {socialMediaArray.length === 0 ? (
-              <h1 className="text-center col-span-full">
-                No social media links available.
-              </h1>
-            ) : (
-              socialMediaArray.map(([platform, url]: any, index) => (
-                // <CardContainer key={index} className="inter-var cursor-pointer h-[150px] max-h-[150px] w-[150px] max-w-[150px]">
-                //   <CardBody className="flex flex-col justify-center items-center bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-full rounded-xl p-6 border">
-                //     <Link href={url} target="_blank" rel="noopener noreferrer">
-                //       <CardItem translateZ="250">
-                //         <span className="flex items-center justify-center">
-                //           {React.createElement(socialIcons[platform] || FaExternalLinkAlt, { className: "text-5xl" })}
-                //         </span>
-                //       </CardItem>
-                //     </Link>
-                //     <CardItem translateZ="100" className="w-full mt-2">
-                //       <h1 className="text-center text-sm font-medium capitalize">
-                //         {platform}
-                //       </h1>
-                //     </CardItem>
-                //   </CardBody>
-                // </CardContainer>
-                <div key={index}>
-                  <Link href={url} target="_blank" rel="noopener noreferrer">
-                    <GlareCard className=" flex flex-col justify-center items-center dark:bg-black-900 bg-black-500">
-                      <span className="flex items-center justify-center dark:text-white text-black">
-                        {React.createElement(
-                          socialIcons[platform] || FaExternalLinkAlt,
-                          { className: "text-5xl" }
-                        )}
-                      </span>
-                    </GlareCard>
-                  </Link>
-                </div>
-              ))
-            )}
-          </div>
-          {session?.user?.id === socialMediaLinksViaPortfolio.userId && (
-            <EditButton
-              className="float-right"
-              onClick={() => setIsEditing(true)}
-            />
+        ))}
+        <div className="flex justify-end space-x-2">
+          <PrimaryButton
+            title="Cancel"
+            onClick={() => setIsEditing(false)}
+            className="bg-red-500 text-white"
+          />
+          <PrimaryButton title="Save Changes" type="submit" />
+        </div>
+      </form>
+    ) : (
+      <div className="relative">
+        <div className="grid sm:grid-cols-6 grid-cols-2 gap-6">
+          {socialMediaArray.length > 0 && (
+            socialMediaArray.map(([platform, url]: any, index) => (
+              <div key={index}>
+                <Link href={url} target="_blank" rel="noopener noreferrer">
+                  <GlareCard className=" flex flex-col justify-center items-center dark:bg-black-900 bg-black-500">
+                    <span className="flex items-center justify-center dark:text-white text-black">
+                      {React.createElement(
+                        socialIcons[platform] || FaExternalLinkAlt,
+                        { className: "text-5xl" }
+                      )}
+                    </span>
+                  </GlareCard>
+                </Link>
+              </div>
+            ))
           )}
         </div>
-      )}
-    </div>
+        {session?.user?.id === socialMediaLinksViaPortfolio.userId && (
+          <EditButton
+            className="float-right"
+            onClick={() => setIsEditing(true)}
+          />
+        )}
+      </div>
+    )}
+  </div>
   )
+    )
 }
 
 export default PortfolioSocials
