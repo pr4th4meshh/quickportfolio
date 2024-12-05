@@ -12,8 +12,12 @@ import PortfolioProjects from "./_components/PortfolioProjects"
 import PortfolioSocials from "./_components/PortfolioSocials"
 import Link from "next/link"
 import CTAComponent from "./_components/CTAComponent"
+import FloatingAddButton  from "./_components/FloatingAddButton"
+import AddItemsButton from "./_components/AddItemsComponent"
+// import { FloatingAddButton } from "./_components/AddItemsComponent"
 
 interface ProfileData {
+  userId: string
   username: string
   name: string
   profession: string
@@ -23,27 +27,26 @@ interface ProfileData {
     style: string
     aiGenerated: boolean
   }
-  // socialMedia: {
-  //   twitter: string
-  //   linkedin: string
-  //   github: string
-  //   website: string
-  //   behance: string
-  //   figma: string
-  //   awwwards: string
-  //   dribbble: string
-  //   medium: string
-  // }
+  socialMedia: {
+    twitter: string
+    linkedin: string
+    github: string
+    website: string
+    behance: string
+    figma: string
+    awwwards: string
+    dribbble: string
+    medium: string
+    instgram: string
+    youtube: string
+  }
   projects: {
     title: string
     description: string
     link: string
     timeline: string
   }[]
-  skills: {
-    name: string
-    endorsements: number
-  }[]
+  features: string[]
   achievements: {
     title: string
     issuer: string
@@ -222,6 +225,22 @@ export default function Portfolio() {
           profileData0={profileData0}
           handleEndorsement={handleEndorsement}
         />
+
+          <FloatingAddButton
+            userId={profileData0.userId}
+            socialMediaLinks={profileData0?.socialMedia}
+            features={profileData0?.features} // Ensure skills are passed correctly
+            projects={profileData0?.projects}
+            onUpdate={(type, newData) => {
+              setProfileData0(prevData => {
+                if (!prevData) return null;
+                return {
+                  ...prevData,
+                  [type === "social" ? "socialLinks" : type === "feature" ? "features" : "projects"]: newData
+                };
+              });
+            }}
+          />
 
         {/* Skills Section */}
         <PortfolioSkills skillsAndFeatures={profileData0} />
