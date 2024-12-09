@@ -12,8 +12,9 @@ import PortfolioProjects from "./_components/PortfolioProjects"
 import PortfolioSocials from "./_components/PortfolioSocials"
 import Link from "next/link"
 import CTAComponent from "./_components/CTAComponent"
-import FloatingAddButton  from "./_components/FloatingAddButton"
+import FloatingAddButton from "./_components/FloatingAddButton"
 import AddItemsButton from "./_components/AddItemsComponent"
+import SharePresssenceButton from "./_components/SharePresssenceButton"
 // import { FloatingAddButton } from "./_components/AddItemsComponent"
 
 interface ProfileData {
@@ -226,21 +227,31 @@ export default function Portfolio() {
           handleEndorsement={handleEndorsement}
         />
 
-          <FloatingAddButton
-            userId={profileData0.userId}
-            socialMediaLinks={profileData0?.socialMedia}
-            features={profileData0?.features} // Ensure skills are passed correctly
-            projects={profileData0?.projects}
-            onUpdate={(type, newData) => {
-              setProfileData0(prevData => {
-                if (!prevData) return null;
-                return {
-                  ...prevData,
-                  [type === "social" ? "socialLinks" : type === "feature" ? "features" : "projects"]: newData
-                };
-              });
-            }}
-          />
+        {session?.data?.user?.id === profileData0?.userId && (
+          <>
+            <SharePresssenceButton />
+
+            <FloatingAddButton
+              userId={profileData0.userId}
+              socialMediaLinks={profileData0?.socialMedia}
+              features={profileData0?.features}
+              projects={profileData0?.projects}
+              onUpdate={(type, newData) => {
+                setProfileData0((prevData) => {
+                  if (!prevData) return null
+                  return {
+                    ...prevData,
+                    [type === "social"
+                      ? "socialLinks"
+                      : type === "feature"
+                      ? "features"
+                      : "projects"]: newData,
+                  }
+                })
+              }}
+            />
+          </>
+        )}
 
         {/* Skills Section */}
         <PortfolioSkills skillsAndFeatures={profileData0} />

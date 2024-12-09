@@ -20,7 +20,7 @@ const BorderStyleButton = ({
     <button
       onClick={onClick}
       className={cn(
-        "relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50",
+        "relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none",
         className
       )}
       disabled={disabled}
