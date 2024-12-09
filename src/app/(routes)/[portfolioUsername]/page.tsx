@@ -129,9 +129,25 @@ export default function Portfolio() {
     }
   }
 
+  const refetchData = async () => {
+    try {
+      const response = await fetch(
+        `/api/portfolio?portfolioUsername=${params.portfolioUsername}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setProfileData0(data); // Update the profileData without triggering loading state
+      } else {
+        console.error("Failed to fetch portfolio data.");
+      }
+    } catch (error) {
+      console.error("Error fetching portfolio data:", error);
+    }
+  }
+
   useEffect(() => {
     handleGetPortfolioInformation()
-  }, [])
+  }, [params.portfolioUsername])
 
   const handleEndorsement = (skillIndex: number) => {
     if (!profileData0) return
@@ -165,7 +181,6 @@ export default function Portfolio() {
     )
   }
 
-  console.log(profileData0, "profileData0")
   const backgroundStyle = {
     modern: `
       bg-gradient-to-r from-blue-100 via-blue-300 to-blue-500
@@ -235,6 +250,7 @@ export default function Portfolio() {
               userId={profileData0.userId}
               socialMediaLinks={profileData0?.socialMedia}
               features={profileData0?.features}
+              refetchData={refetchData}
               projects={profileData0?.projects}
               onUpdate={(type, newData) => {
                 setProfileData0((prevData) => {

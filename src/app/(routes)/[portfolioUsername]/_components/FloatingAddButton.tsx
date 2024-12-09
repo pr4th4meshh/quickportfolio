@@ -15,6 +15,7 @@ interface FloatingAddButtonProps {
   features: string[] | undefined
   projects: any[] | undefined
   onUpdate: (type: AddItemType, newData: any) => void
+  refetchData: () => void
 }
 
 const FloatingAddButton = ({
@@ -22,7 +23,7 @@ const FloatingAddButton = ({
   features,
   projects,
   onUpdate,
-  userId,
+  refetchData,
 }: FloatingAddButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [addType, setAddType] = useState<AddItemType | null>(null)
@@ -51,6 +52,10 @@ const FloatingAddButton = ({
     try {
       let updatedData
       if (addType === "social") {
+        if (socialMediaLinks && socialMediaLinks[newItem]) {
+          showToast("This social media link already exists.")
+          return
+        }
         updatedData = { ...socialMediaLinks, [newItem]: newSocialLink }
       } else if (addType === "feature") {
         updatedData = [...(features || []), newItem]
@@ -79,17 +84,30 @@ const FloatingAddButton = ({
         setNewItem("")
         setNewSocialLink("")
         setNewProject({ title: "", description: "", link: "", timeline: "" })
-        // alert(`New ${addType} added successfully.`)
         showToast(`New ${addType} added successfully.`)
+        refetchData()
       } else {
         throw new Error("Failed to update")
       }
     } catch (error) {
       console.error(`Error adding ${addType}:`, error)
-      // alert(`Failed to add new ${addType}.`)
       showToast(`Failed to add new ${addType}.`)
     }
   }
+
+  const availablePlatforms = [
+    "twitter",
+    "linkedin",
+    "github",
+    "website",
+    "behance",
+    "figma",
+    "awwwards",
+    "dribbble",
+    "medium",
+    "youtube",
+    "instagram",
+  ].filter(platform => !(socialMediaLinks && socialMediaLinks[platform]))
 
   return (
     <>
@@ -141,17 +159,11 @@ const FloatingAddButton = ({
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                       >
                         <option value="">Select a platform</option>
-                        <option value="twitter">Twitter</option>
-                        <option value="linkedin">LinkedIn</option>
-                        <option value="github">GitHub</option>
-                        <option value="website">Website</option>
-                        <option value="behance">Behance</option>
-                        <option value="figma">Figma</option>
-                        <option value="awwwards">Awwwards</option>
-                        <option value="dribbble">Dribbble</option>
-                        <option value="medium">Medium</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="instagram">Instagram</option>
+                        {availablePlatforms.map(platform => (
+                          <option key={platform} value={platform}>
+                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div>
