@@ -5,7 +5,6 @@
  **/
 
 import { cn } from "@/lib/utils"
-// import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
 import {
   AnimatePresence,
   MotionValue,
@@ -17,7 +16,6 @@ import {
 import Link from "next/link"
 import { useRef, useState } from "react"
 import { BiCollapseAlt } from "react-icons/bi"
-import { FcCollapse } from "react-icons/fc"
 
 export const FloatingDock = ({
   items,

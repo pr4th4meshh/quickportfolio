@@ -168,7 +168,7 @@ const PortfolioHero = ({ profileData, profileData0 }: any) => {
                 </p>
               {session?.user?.id === profileData0?.userId && (
                 <EditButton
-                  className="mt-4 float-right"
+                  className="mt-4 float-right mr-2"
                   onClick={() => setIsEditing(true)}
                 />
               )}

@@ -17,7 +17,7 @@ const Navbar = () => {
   console.log(session)
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6 shadow-md">
+    <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6">
       <div className="flex items-center justify-between mx-auto w-min sm:w-[50vw] border-[#404040] border-2 py-4 sm:py-4 px-6 sm:px-8 rounded-full space-x-6">
         <div>
           <h1 className="text-black dark:text-white text-xl font-bold">

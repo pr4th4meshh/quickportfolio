@@ -4,14 +4,12 @@ import { FlipWords } from "./ui/flip-words"
 import BorderStyleButton from "./ui/border-button"
 import { IoLogoGithub, IoLogoLinkedin, IoLogoTwitter } from "react-icons/io"
 import { FloatingDock } from "./ui/floating-dock"
-import { RxCross1 } from "react-icons/rx"
 import { FaUpwork } from "react-icons/fa6"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Navbar from "./Navbar"
 import { useEffect, useState } from "react"
 import { BiGlobe } from "react-icons/bi"
-import PrimaryButton from "./ui/primary-button"
 import SignupModal from "./SignupModal"
 
 interface Portfolio {
@@ -43,7 +41,7 @@ export default function Hero() {
       icon: (
         <IoLogoGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "https://github.com/pr4th4meshh/quickportfolio",
+      href: "https://github.com/pr4th4meshh/presssence",
     },
     {
       title: "X (former Twitter)",
