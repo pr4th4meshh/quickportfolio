@@ -28,6 +28,9 @@ export default function RootLayout({
   return (
     <NextAuthSessionProvider>
       <html lang="en" suppressHydrationWarning>
+        <head>
+        <link rel="icon" href="/favicon.ico" />
+        </head>
         <body className={`${poppins.variable} antialiased`}>
           <Providers>
             {/* <ServerNavbar /> */}
