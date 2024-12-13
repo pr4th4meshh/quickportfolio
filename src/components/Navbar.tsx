@@ -1,5 +1,5 @@
 "use client"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import PrimaryButton from "./ui/primary-button"
 import Image from "next/image"
 import Default_Avatar from "../../public/qp_default_avatar.jpg"
@@ -7,7 +7,14 @@ import ThemeSwitch from "./ui/ThemeSwitch"
 import { signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 
+interface IUser {
+  image: string
+  name: string
+  email: string
+}
+
 const Navbar = () => {
+  const [userData, setUserData] = useState<IUser | null>(null)
   const router = useRouter()
   const session = useSession()
   const handleLogout = () => {
@@ -15,6 +22,29 @@ const Navbar = () => {
   }
 
   console.log(session)
+  const userId = session?.data?.user?.id
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await fetch(`/api/user?username=${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      const data = await response.json()
+      console.log(data, "incominguser data")
+      setUserData(data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchUserDetails()
+    console.log("useeffect triggered")
+  }, [session?.data])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-10 bg-transparent py-4 px-6">
@@ -31,12 +61,9 @@ const Navbar = () => {
               <div className="hidden sm:flex items-center space-x-1">
                 <Image
                   src={
-                    session.data?.user.image
-                      ? session.data?.user.image
-                      : Default_Avatar
+                    userData?.image ||
+                       Default_Avatar
                   }
-                  placeholder="blur"
-                  blurDataURL={session.data?.user.image as string}
                   alt="avatar"
                   className="w-[40px] h-[40px] mr-1 rounded-full object-contain"
                   height={50}
