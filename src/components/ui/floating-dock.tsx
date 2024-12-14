@@ -15,7 +15,8 @@ import {
 } from "framer-motion"
 import Link from "next/link"
 import { useRef, useState } from "react"
-import { BiCollapseAlt } from "react-icons/bi"
+import { AiOutlinePlus } from "react-icons/ai";
+import { IoClose } from "react-icons/io5";
 
 export const FloatingDock = ({
   items,
@@ -83,7 +84,7 @@ const FloatingDockMobile = ({
         onClick={() => setOpen(!open)}
         className="h-10 w-10 rounded-full bg-gray-50 dark:bg-neutral-800 dark:text-white border dark:border-none text-black flex items-center justify-center"
       >
-        <BiCollapseAlt />
+       { open ? <IoClose /> : <AiOutlinePlus /> }
       </button>
     </div>
   )
