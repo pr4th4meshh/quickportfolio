@@ -7,17 +7,32 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import DefaultProfileImage from "../../../../../public/qp_default_avatar.jpg"
 import PrimaryButton from "@/components/ui/primary-button"
 import EditButton from "./EditButton"
+import { RiDoubleQuotesL } from "react-icons/ri"
 
-const PortfolioHero = ({ profileData, profileData0 }) => {
+interface IUser {
+  image: string
+  name: string
+  email: string
+}
+
+interface IProfileData {
+  fullName: string
+  profession: string
+  headline: string
+  theme: string
+}
+
+const PortfolioHero = ({ profileData }: IProfileData) => {
   const params = useParams()
   const { data: session, update } = useSession()
   const [isEditing, setIsEditing] = useState(false)
-  const [fullName, setFullName] = useState(profileData0?.fullName || "")
-  const [profession, setProfession] = useState(profileData0?.profession || "")
-  const [headline, setHeadline] = useState(profileData0?.headline || "")
-  const [theme, setTheme] = useState(profileData0?.theme || "modern")
+  const [fullName, setFullName] = useState(profileData?.fullName || "")
+  const [profession, setProfession] = useState(profileData?.profession || "")
+  const [headline, setHeadline] = useState(profileData?.headline || "")
+  const [theme, setTheme] = useState(profileData?.theme || "modern")
   const [file, setFile] = useState(null) 
-  const [userData, setUserData] = useState(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [userData, setUserData] = useState<IUser | null>(null)
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0]
@@ -26,7 +41,23 @@ const PortfolioHero = ({ profileData, profileData0 }) => {
     }
   }
 
-  const userId = session?.user.id
+  const getUserId = async () => {
+    try {
+      const response = await fetch(`/api/portfolio/get-user-id?portfolioUsername=${params.portfolioUsername}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      const data = await response.json()
+      setUserId(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
   const fetchUserDetails = async () => {
     try {
       const response = await fetch(`/api/user?username=${userId}`, {
@@ -37,7 +68,6 @@ const PortfolioHero = ({ profileData, profileData0 }) => {
       })
 
       const data = await response.json()
-      console.log(data, "incominguser data")
       setUserData(data)
     } catch (error) {
       console.log(error)
@@ -45,9 +75,13 @@ const PortfolioHero = ({ profileData, profileData0 }) => {
   }
 
   useEffect(() => {
-    fetchUserDetails()
-    console.log("useeffect triggered")
-  }, [session?.user])
+    getUserId()
+  }, [params.portfolioUsername])
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, [userId])
+  
   const handleUpload = async () => {
     if (!file) return
 
@@ -71,7 +105,6 @@ const PortfolioHero = ({ profileData, profileData0 }) => {
       if (response.ok) {
         update({ ...session, user: { ...session.user, image: downloadURL } })
       }
-      console.log(data)
       alert("Profile image updated successfully!")
     } catch (error) {
       console.error("Error uploading image:", error)
@@ -114,19 +147,17 @@ const PortfolioHero = ({ profileData, profileData0 }) => {
     }
   }
 
-  console.log(session?.user.image)
-  console.log("USer", userData)
   return (
-    <div className="container mx-auto px-4 py-12 md:py-24">
+    <div className="container mx-auto px-4 py-20 md:py-24">
       <div className="flex flex-col md:flex-row items-center justify-between space-y-12 md:space-y-0 md:space-x-12">
         <div className="w-full sm:w-1/3 flex flex-col items-center space-y-6">
           <div className="relative group">
             <Image
               src={userData?.image || DefaultProfileImage}
-              alt={profileData.name}
+              alt={`${fullName}'s Profile Picture`}
               width={400}
               height={400}
-              className="rounded-full object-cover max-w-full h-[400px]"
+              className="rounded-full object-cover w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] border-2 dark:border-white border-black"
             />
           </div>
           {isEditing && (
@@ -137,12 +168,6 @@ const PortfolioHero = ({ profileData, profileData0 }) => {
                 onChange={handleFileChange}
                 className="mt-4"
               />
-              {/* <button
-                onClick={handleUpload}
-                className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
-              >
-                Upload
-              </button> */}
              {
               file &&  <PrimaryButton 
               title="Upload profile picture"
@@ -233,19 +258,19 @@ const PortfolioHero = ({ profileData, profileData0 }) => {
               />
             </form>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 flex flex-col sm:justify-normal justify-center sm:items-start items-center">
               <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-100">
                 {fullName}
               </h1>
-              <p className="text-2xl md:text-4xl text-black dark:text-white">
+              <p className="text-3xl md:text-4xl text-black dark:text-white">
                 {profession}
               </p>
-              <p className="text-xl md:text-2xl flex italic dark:text-white text-black dpy-4">
-                {headline}
+              <p className="text-xl md:text-2xl flex italic dark:text-white text-black text-center">
+                <RiDoubleQuotesL className="mr-2" /> {headline}
               </p>
-              {session?.user?.id === profileData0?.userId && (
+              {session?.user?.id === profileData?.userId && (
                 <EditButton
-                  className="mt-4 float-right mr-2"
+                  className="mt-4 flex self-end mr-2"
                   onClick={() => setIsEditing(true)}
                 />
               )}

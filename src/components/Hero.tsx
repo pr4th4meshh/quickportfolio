@@ -74,7 +74,6 @@ export default function Hero() {
   ]
 
   const session = useSession()
-  console.log("SSESSS", session)
   const fetchUser = async () => {
     try {
       const response = await fetch(
@@ -104,8 +103,6 @@ export default function Hero() {
     }
   }, [session.status])
 
-  console.log("USER", user)
-
   const handleCreatePortfolio = () => {
     if (session.status === "authenticated") {
       if (user?.portfolio) {
@@ -125,9 +122,9 @@ export default function Hero() {
           <h1 className="text-5xl sm:text-7xl text-center font-bold text-gray-900 dark:text-white my-10">
             No Portfolio? No Problem!
           </h1>
-          <div className="text-4xl sm:text-6xl font-normal text-center sm:text-start text-white dark:text-neutral-400">
+          <div className="text-3xl sm:text-6xl font-normal text-center sm:text-start text-white dark:text-neutral-400">
             Build
-            <FlipWords className="text-white" words={words} /> <br />
+            <FlipWords className="text-white" words={words} /> <br className="hidden sm:block" />
             portfolio site with just a few clicks
           </div>
 
