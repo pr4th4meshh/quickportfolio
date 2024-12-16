@@ -98,10 +98,8 @@ const PortfolioSkills = ({ skillsAndFeatures }: any) => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-7">
             {skills.map((skill: string, index: number) => (
               <div key={index} className="text-center">
-                <div className="dark:text-white text-black p-2 relative dark:bg-black bg-light mx-5">
+                <div className="dark:text-white border border-gray-500 text-black p-2 relative rounded-2xl mx-5">
                   {skill}
-                  <div className="absolute bottom-0 h-[2px] inset-x-0 w-full bg-gradient-to-r from-transparent via-purple-500 to-transparent"/>
-                  <div className="absolute bottom-0 h-[2px] w-1/2 mx-auto inset-x-0 bg-gradient-to-r from-transparent via-blue-500 to-transparent"/>
                 </div>
               </div>
             ))}

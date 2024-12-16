@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useParams } from "next/navigation"
-import { storage } from "@/lib/firebase" // Adjust the path based on your folder structure
+import { storage } from "@/lib/firebase"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
-import DefaultProfileImage from "../../../../../public/qp_default_avatar.jpg"
 import PrimaryButton from "@/components/ui/primary-button"
 import EditButton from "./EditButton"
 import { RiDoubleQuotesL } from "react-icons/ri"
+import "react-loading-skeleton/dist/skeleton.css"
 
 interface IUser {
   image: string
@@ -30,7 +30,7 @@ const PortfolioHero = ({ profileData }: IProfileData) => {
   const [profession, setProfession] = useState(profileData?.profession || "")
   const [headline, setHeadline] = useState(profileData?.headline || "")
   const [theme, setTheme] = useState(profileData?.theme || "modern")
-  const [file, setFile] = useState(null) 
+  const [file, setFile] = useState(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [userData, setUserData] = useState<IUser | null>(null)
 
@@ -43,20 +43,22 @@ const PortfolioHero = ({ profileData }: IProfileData) => {
 
   const getUserId = async () => {
     try {
-      const response = await fetch(`/api/portfolio/get-user-id?portfolioUsername=${params.portfolioUsername}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      const response = await fetch(
+        `/api/portfolio/get-user-id?portfolioUsername=${params.portfolioUsername}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
 
       const data = await response.json()
-      setUserId(data);
+      setUserId(data)
     } catch (error) {
       console.log(error)
     }
   }
-
 
   const fetchUserDetails = async () => {
     try {
@@ -79,9 +81,9 @@ const PortfolioHero = ({ profileData }: IProfileData) => {
   }, [params.portfolioUsername])
 
   useEffect(() => {
-    fetchUserDetails();
+    fetchUserDetails()
   }, [userId])
-  
+
   const handleUpload = async () => {
     if (!file) return
 
@@ -119,7 +121,7 @@ const PortfolioHero = ({ profileData }: IProfileData) => {
       fullName,
       profession,
       headline,
-      theme
+      theme,
     }
 
     try {
@@ -147,18 +149,28 @@ const PortfolioHero = ({ profileData }: IProfileData) => {
     }
   }
 
+  const ImageLoadingSkeleton = () => {
+    return (
+      <div className="w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] bg-gray-400 rounded-full animate-pulse" />
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-20 md:py-24">
       <div className="flex flex-col md:flex-row items-center justify-between space-y-12 md:space-y-0 md:space-x-12">
         <div className="w-full sm:w-1/3 flex flex-col items-center space-y-6">
           <div className="relative group">
-            <Image
-              src={userData?.image || DefaultProfileImage}
-              alt={`${fullName}'s Profile Picture`}
-              width={400}
-              height={400}
-              className="rounded-full object-cover w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] border-2 dark:border-white border-black"
-            />
+            {!userData?.image ? (
+              <ImageLoadingSkeleton />
+            ) : (
+              <Image
+                src={userData?.image}
+                alt={`${fullName}'s Profile Picture`}
+                width={400}
+                height={400}
+                className="rounded-full object-cover w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] border-2 dark:border-white border-black"
+              />
+            )}
           </div>
           {isEditing && (
             <div>
@@ -168,13 +180,13 @@ const PortfolioHero = ({ profileData }: IProfileData) => {
                 onChange={handleFileChange}
                 className="mt-4"
               />
-             {
-              file &&  <PrimaryButton 
-              title="Upload profile picture"
-                onClick={handleUpload}
-                className="bg-orange-500 text-white mt-2 w-full max-w-full border-orange-200"
-              />
-             }
+              {file && (
+                <PrimaryButton
+                  title="Upload profile picture"
+                  onClick={handleUpload}
+                  className="bg-orange-500 text-white mt-2 w-full max-w-full border-orange-200"
+                />
+              )}
               <PrimaryButton
                 title="Cancel Editing"
                 onClick={() => setIsEditing(false)}

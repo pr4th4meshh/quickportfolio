@@ -13,6 +13,10 @@ import PortfolioSocials from "./_components/PortfolioSocials"
 import CTAComponent from "./_components/CTAComponent"
 import FloatingAddButton from "./_components/FloatingAddButton"
 import SharePresssenceButton from "./_components/SharePresssenceButton"
+import { set } from "zod"
+import PrimaryButton from "@/components/ui/primary-button"
+import Link from "next/link"
+import NoPortfolioScreen from "./_components/NoPortfolioScreen"
 
 interface ProfileData {
   userId: string
@@ -61,6 +65,7 @@ interface ProfileData {
 export default function Portfolio() {
   const params = useParams()
   const [profileData0, setProfileData0] = useState<ProfileData | null>(null)
+  const [portfolioExists, setPortfolioExists] = useState(true)
   const [loading, setLoading] = useState(true)
   const session = useSession()
 
@@ -72,12 +77,14 @@ export default function Portfolio() {
       )
 
       if (!response.ok) {
-        throw new Error("Failed to fetch portfolio data.")
+        setPortfolioExists(false)
+        return;
       }
 
       const data = await response.json()
       if (data) {
         setProfileData0(data)
+        setPortfolioExists(true)
       } else {
         console.error("Portfolio fetch failed:", data.message)
       }
@@ -92,15 +99,15 @@ export default function Portfolio() {
     try {
       const response = await fetch(
         `/api/portfolio?portfolioUsername=${params.portfolioUsername}`
-      );
+      )
       if (response.ok) {
-        const data = await response.json();
-        setProfileData0(data); // Update the profileData without triggering loading state
+        const data = await response.json()
+        setProfileData0(data) // Update the profileData without triggering loading state
       } else {
-        console.error("Failed to fetch portfolio data.");
+        console.error("Failed to fetch portfolio data.")
       }
     } catch (error) {
-      console.error("Error fetching portfolio data:", error);
+      console.error("Error fetching portfolio data:", error)
     }
   }
 
@@ -132,11 +139,9 @@ export default function Portfolio() {
     )
   }
 
-  if (!profileData0) {
+  if (!portfolioExists) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        No profile data found.
-      </div>
+     <NoPortfolioScreen />
     )
   }
 
@@ -185,7 +190,6 @@ export default function Portfolio() {
   // }
 
   return (
-    // <div className={`min-h-screen ${backgroundStyle["bold"]} `}>
     <div className="min-h-screen dark:bg-black bg-light">
       {/* Call to action component on the right to create new portfolio/pressence  */}
       <CTAComponent />
