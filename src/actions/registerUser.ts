@@ -8,12 +8,14 @@ interface IFormData {
   name: string
   email: string
   password: string
+  image: string
 }
 
 export async function registerUser(
   name: string,
   email: string,
-  password: string
+  password: string,
+  image: string
 ) {
   try {
     // Check if user already exists
@@ -25,23 +27,26 @@ export async function registerUser(
       return { error: "User already exists" }
     }
 
+    console.log("HEHEHELE")
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // Create the user
+    console.log("#######################")
     await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        portfolio: {
-          create: [],
-        },
+        image,
+        portfolio: {}
       },
     })
-
+console.log("**********************")
     // Sign in the user
     const response = await signIn("credentials", { email, password })
+    console.log(response, "RESPONSE")
     
     if(response?.error) {
       return { error: response.error}
