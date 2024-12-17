@@ -35,9 +35,9 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
-  email         String?   @unique
+  email         String?    @unique
   password      String?
   emailVerified DateTime?
   image         String?
@@ -56,20 +56,20 @@ model VerificationToken {
 }
 
 model Portfolio {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  username    String        @unique
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  username    String       @unique
   fullName    String
   profession  String
   headline    String?
-  theme       String        @default("modern")
+  theme       String       @default("modern")
   socialMedia SocialLinks?
   features    String[]
   projects    Project[]
-  userId      String        @unique @db.ObjectId
-  User        User          @relation(fields: [userId], references: [id])
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  isExisting  Boolean       @default(false)
+  userId      String       @unique @db.ObjectId
+  User        User         @relation(fields: [userId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  isExisting  Boolean      @default(false)
 }
 
 model SocialLinks {
@@ -95,6 +95,7 @@ model Project {
   description String
   link        String?
   timeline    String?
+  coverImage  String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   portfolioId String    @db.ObjectId

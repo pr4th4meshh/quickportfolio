@@ -29,6 +29,8 @@ import { formSchema, FormData } from "@/lib/zod"
 import { CustomTagsInput } from "@/components/CustomTagsInput"
 import { PiSpinner } from "react-icons/pi";
 import { useDebounce } from "@/hooks/useDebounce"
+import { storage } from "@/lib/firebase"
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 
 export default function OnboardingForm() {
   const [step, setStep] = useState(1)
@@ -36,6 +38,7 @@ export default function OnboardingForm() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(true)
   const [checkingUsernameLoading, setCheckingUsernameLoading] = useState(false)
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
   const router = useRouter()
 
@@ -96,6 +99,32 @@ export default function OnboardingForm() {
     event.preventDefault()
     setStep((prev) => prev - 1)
   }
+
+  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const storageRef = ref(storage, `projects/${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Optionally, handle progress state here
+        },
+        (error) => {
+          console.error("Error uploading image:", error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            // Set the URL of the uploaded cover image
+            setCoverImageUrl(downloadURL);
+            // Update the project object with the cover image URL
+            setValue(`projects.${index}.coverImage`, downloadURL);
+          });
+        }
+      );
+    }
+  };
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -420,6 +449,26 @@ export default function OnboardingForm() {
                       className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                       {...register(`projects.${index}.timeline` as const)}
                     />
+
+<div>
+                      <label htmlFor={`projects.${index}.coverImage`} className="block text-sm font-medium">
+                        Cover Image
+                      </label>
+                      <input
+                        id={`projects.${index}.coverImage`}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleCoverImageUpload(e, index)}
+                        className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {errors.projects?.[index]?.coverImage && (
+                        <p className="text-sm text-red-500">
+                          {errors.projects[index].coverImage.message}
+                        </p>
+                      )}
+                    </div>
+                    
+
                     {errors.projects?.[index]?.timeline && (
                       <p className="text-sm text-red-500">
                         {errors.projects[index].timeline.message}

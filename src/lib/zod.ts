@@ -41,6 +41,7 @@ export const formSchema = z.object({
       description: z.string().max(500),
       link: z.string().url("Enter a valid URL").optional(),
       timeline: z.string(),
+      coverImage: z.string().optional(),
     })
   ),
   socialMedia: z.object({

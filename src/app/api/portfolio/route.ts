@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { authOptions, getAuthSession } from "@/lib/serverAuth"
+import { authOptions } from "@/lib/serverAuth"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
@@ -8,20 +8,7 @@ interface IProject {
   description: string
   link: string
   timeline: string
-}
-
-interface ISocialLink {
-  twitter: string
-  linkedin: string
-  github: string
-  instagram: string
-  youtube: string
-  medium: string
-  website: string
-  behance: string
-  figma: string
-  awwwards: string
-  dribbble: string
+  coverImage?: string
 }
 
 export async function POST(req: Request) {
@@ -34,7 +21,7 @@ export async function POST(req: Request) {
       features,
       projects,
       username,
-      socialLinks,
+      socialLinks,  
     } = await req.json()
 
     const session = await getServerSession(authOptions)
@@ -93,6 +80,7 @@ export async function POST(req: Request) {
             title: project.title,
             description: project.description,
             link: project.link || "",
+            coverImage: project.coverImage || "",
             timeline: project.timeline || "",
           })),
         },
@@ -208,16 +196,18 @@ export async function PUT(req: Request) {
     if (updateData.headline) portfolioUpdate.headline = updateData.headline
     if (updateData.theme) portfolioUpdate.theme = updateData.theme
     if (updateData.features) portfolioUpdate.features = updateData.features
+    if (updateData.coverImage) portfolioUpdate.coverImage = updateData.coverImage 
 
     // Update projects if provided
     if (updateData.projects) {
       portfolioUpdate.projects = {
         deleteMany: {},
-        create: updateData.projects.map((project: any) => ({
+        create: updateData.projects.map((project: IProject) => ({
           title: project.title,
           description: project.description,
           link: project.link || "",
           timeline: project.timeline || "",
+          coverImage: project.coverImage || "",
         })),
       }
     }
