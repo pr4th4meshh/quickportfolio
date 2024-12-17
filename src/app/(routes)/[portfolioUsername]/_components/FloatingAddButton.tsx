@@ -6,6 +6,9 @@ import { FaPlus, FaTimes } from "react-icons/fa"
 import Toast from "@/components/PopupToast"
 import BorderStyleButton from "@/components/ui/border-button"
 import { IoAdd, IoClose } from "react-icons/io5"
+import { storage } from "@/lib/firebase"
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
+import Image from "next/image"
 
 type AddItemType = "social" | "feature" | "project"
 
@@ -34,9 +37,13 @@ const FloatingAddButton = ({
     description: "",
     link: "",
     timeline: "",
+    coverImage: "",
   })
   const [toast, setToast] = useState({ message: "", visible: false })
+  const [imageUploadProgress, setImageUploadProgress] = useState(0)
   const params = useParams()
+
+  let progress = 0;
 
   const showToast = (message: string) => {
     setToast({ message, visible: true })
@@ -83,7 +90,13 @@ const FloatingAddButton = ({
         setIsOpen(false)
         setNewItem("")
         setNewSocialLink("")
-        setNewProject({ title: "", description: "", link: "", timeline: "" })
+        setNewProject({
+          title: "",
+          description: "",
+          link: "",
+          timeline: "",
+          coverImage: "",
+        })
         showToast(`New ${addType} added successfully.`)
         refetchData()
       } else {
@@ -92,6 +105,44 @@ const FloatingAddButton = ({
     } catch (error) {
       console.error(`Error adding ${addType}:`, error)
       showToast(`Failed to add new ${addType}.`)
+    }
+  }
+
+  const handleCoverImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Show some UI feedback here if needed (uploading...)
+      const storageRef = ref(storage, `projects/${file.name}`)
+      const uploadTask = uploadBytesResumable(storageRef, file)
+
+      // Monitor the upload progress (optional)
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          setImageUploadProgress(progress)
+        },
+        (error) => {
+          console.error("Error uploading image:", error)
+          // Show an error toast or feedback if required
+        },
+        async () => {
+          // After successful upload, get the download URL
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+
+            // Set the cover image URL in the project
+            setNewProject((prevProject) => ({
+              ...prevProject,
+              coverImage: downloadURL, // Set the image URL
+            }))
+          } catch (err) {
+            console.error("Failed to get download URL:", err)
+          }
+        }
+      )
     }
   }
 
@@ -107,7 +158,7 @@ const FloatingAddButton = ({
     "medium",
     "youtube",
     "instagram",
-  ].filter(platform => !(socialMediaLinks && socialMediaLinks[platform]))
+  ].filter((platform) => !(socialMediaLinks && socialMediaLinks[platform]))
 
   return (
     <>
@@ -159,9 +210,10 @@ const FloatingAddButton = ({
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                       >
                         <option value="">Select a platform</option>
-                        {availablePlatforms.map(platform => (
+                        {availablePlatforms.map((platform) => (
                           <option key={platform} value={platform}>
-                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                            {platform.charAt(0).toUpperCase() +
+                              platform.slice(1)}
                           </option>
                         ))}
                       </select>
@@ -284,6 +336,31 @@ const FloatingAddButton = ({
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       />
                     </div>
+
+                    <div>
+                      <label
+                        htmlFor="coverImage"
+                        className="block text-sm font-medium"
+                      >
+                        Cover Image
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleCoverImageUpload(e)}
+                        className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                      />
+                      {newProject.coverImage && (
+                        <Image
+                          src={newProject.coverImage}
+                          alt="Cover preview"
+                          className="mt-2 w-[150px] h-[150px] object-cover border rounded-xl dark:border-white border-black"
+                          height={200}
+                          width={200}
+                        />
+                      )}
+                    </div>
+                    {imageUploadProgress > 0 && <h1>Uploading image.. {imageUploadProgress}%</h1>}
                   </>
                 )}
                 <div className="flex justify-end space-x-2">
