@@ -78,7 +78,7 @@ export default function Portfolio() {
 
       if (!response.ok) {
         setPortfolioExists(false)
-        return;
+        return
       }
 
       const data = await response.json()
@@ -140,9 +140,7 @@ export default function Portfolio() {
   }
 
   if (!portfolioExists) {
-    return (
-     <NoPortfolioScreen />
-    )
+    return <NoPortfolioScreen />
   }
 
   // const backgroundStyle = {
@@ -192,7 +190,7 @@ export default function Portfolio() {
   return (
     <div className="min-h-screen dark:bg-black bg-light">
       {/* Call to action component on the right to create new portfolio/pressence  */}
-      <CTAComponent />
+      {session?.data?.user.id !== profileData0?.userId && <CTAComponent />}
       {/* Page Header / Navbar  */}
       <PageHeader />
       <div className="container mx-auto max-w-7xl">

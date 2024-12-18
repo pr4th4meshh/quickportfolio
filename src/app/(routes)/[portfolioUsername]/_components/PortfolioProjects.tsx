@@ -32,7 +32,9 @@ const PortfolioProjects = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [projects, setProjects] = useState<IProject[]>(initialProjects.projects)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imagePreviews, setImagePreviews] = useState<(string | null)[]>(
+    new Array(initialProjects.projects.length).fill(null)
+  );
   const [uploading, setUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [imageUploaded, setImageUploaded] = useState(false)
@@ -57,10 +59,12 @@ const PortfolioProjects = ({
       ...projects,
       { title: "", description: "", link: "", timeline: "" },
     ])
+    setImagePreviews([...imagePreviews, null])
   }
 
   const handleRemoveProject = (index: number) => {
     setProjects(projects.filter((_, i) => i !== index))
+    setImagePreviews(imagePreviews.filter((_, i) => i !== index));
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -69,7 +73,9 @@ const PortfolioProjects = ({
       // Preview the selected image
       const reader = new FileReader()
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
+        const updatedPreviews = [...imagePreviews];
+        updatedPreviews[index] = reader.result as string; // Set preview for the specific project
+        setImagePreviews(updatedPreviews);
         setSelectedFile(file)
       }
       reader.readAsDataURL(file)
@@ -231,10 +237,10 @@ const PortfolioProjects = ({
                     onChange={(e) => handleImageChange(e, index)}
                     className="block w-full p-2 border border-gray-300 rounded-md"
                   />
-                  {imagePreview && (
+                  {imagePreviews[index] && (
                     <div className="mt-4">
                       <Image
-                        src={imagePreview}
+                        src={imagePreviews[index]!}
                         alt="Image Preview"
                         className="h-32 w-32 object-cover border rounded-xl dark:border-white border-black"
                         height={100}
@@ -244,10 +250,10 @@ const PortfolioProjects = ({
                   )}
                   {uploading && <p>Uploading... {uploadProgress}%</p>}
                   {imageUploaded && <p className="text-blue-400 mt-2">Image uploaded successfully! Click Save changes to apply the changes.</p>}
-                  {!uploading && imagePreview && (
+                  {!uploading && imagePreviews[index] && (
                     <button
                       type="button"
-                      disabled={!selectedFile || imageUploaded}
+                      // disabled={!selectedFile || imageUploaded}
                       onClick={() => handleUploadImage(index)}
                       className="mt-2 inline-flex items-center disabled:opacity-80 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
                     >
