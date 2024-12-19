@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useEffect, useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
@@ -27,7 +27,7 @@ import { BiLeftArrowAlt } from "react-icons/bi"
 import { useRouter } from "next/navigation"
 import { formSchema, FormData } from "@/lib/zod"
 import { CustomTagsInput } from "@/components/CustomTagsInput"
-import { PiSpinner } from "react-icons/pi";
+import { PiSpinner } from "react-icons/pi"
 import { useDebounce } from "@/hooks/useDebounce"
 import { storage } from "@/lib/firebase"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
@@ -38,7 +38,9 @@ export default function OnboardingForm() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(true)
   const [checkingUsernameLoading, setCheckingUsernameLoading] = useState(false)
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  let progress = 0
 
   const router = useRouter()
 
@@ -64,7 +66,7 @@ export default function OnboardingForm() {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true)
-      const features = selectedFeatures;
+      const features = selectedFeatures
 
       const socialLinks = Object.fromEntries(
         Object.entries(data.socialMedia).filter(
@@ -100,31 +102,35 @@ export default function OnboardingForm() {
     setStep((prev) => prev - 1)
   }
 
-  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
+  const handleCoverImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const file = e.target.files?.[0]
     if (file) {
-      const storageRef = ref(storage, `projects/${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const storageRef = ref(storage, `projects/${file.name}`)
+      const uploadTask = uploadBytesResumable(storageRef, file)
 
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Optionally, handle progress state here
+          progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          setUploadProgress(progress)
         },
         (error) => {
-          console.error("Error uploading image:", error);
+          console.error("Error uploading image:", error)
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             // Set the URL of the uploaded cover image
-            setCoverImageUrl(downloadURL);
+            setCoverImageUrl(downloadURL)
             // Update the project object with the cover image URL
-            setValue(`projects.${index}.coverImage`, downloadURL);
-          });
+            setValue(`projects.${index}.coverImage`, downloadURL)
+          })
         }
-      );
+      )
     }
-  };
+  }
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -136,40 +142,40 @@ export default function OnboardingForm() {
 
   const checkUsernameAvailability = async (username: string) => {
     if (!username) {
-      setIsUsernameAvailable(true);
-      return;
-    }      
-  
+      setIsUsernameAvailable(true)
+      return
+    }
+
     try {
-    if(username.length > 2) {
-      setCheckingUsernameLoading(true)
-      const res = await fetch('/api/checkUsername', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username }),
-      });
-  
-      const data = await res.json();
-      if (res.ok) {
-        setIsUsernameAvailable(data.available);
-      } else {
-        setIsUsernameAvailable(true);
+      if (username.length > 2) {
+        setCheckingUsernameLoading(true)
+        const res = await fetch("/api/checkUsername", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username }),
+        })
+
+        const data = await res.json()
+        if (res.ok) {
+          setIsUsernameAvailable(data.available)
+        } else {
+          setIsUsernameAvailable(true)
+        }
       }
-    }
     } catch (error) {
-      console.error(error);
-      setIsUsernameAvailable(false);
+      console.error(error)
+      setIsUsernameAvailable(false)
     } finally {
-      setCheckingUsernameLoading(false);
+      setCheckingUsernameLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    checkUsernameAvailability(debouncedValue);
-  }, [debouncedValue]);
-  
+    checkUsernameAvailability(debouncedValue)
+  }, [debouncedValue])
+
   return (
     <WavyBackground>
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -193,22 +199,38 @@ export default function OnboardingForm() {
               <div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                  <label
-                    htmlFor="username"
-                    className="block text-sm font-medium"
-                  >
-                    Choose your username
-                  </label>
-                  {checkingUsernameLoading && <p className="text-sm text-gray-500"><PiSpinner className="animate-spin text-xl dark:text-white text-black" /></p>}
-                  {!checkingUsernameLoading && isUsernameAvailable && checkingUsername?.length > 2 && <p className="text-sm text-green-500">Username available!</p>}
-                  {!checkingUsernameLoading && !isUsernameAvailable && <p className="text-sm text-red-500">Username unavailable or already taken</p>}
+                    <label
+                      htmlFor="username"
+                      className="block text-sm font-medium"
+                    >
+                      Choose your username
+                    </label>
+                    {checkingUsernameLoading && (
+                      <p className="text-sm text-gray-500">
+                        <PiSpinner className="animate-spin text-xl dark:text-white text-black" />
+                      </p>
+                    )}
+                    {!checkingUsernameLoading &&
+                      isUsernameAvailable &&
+                      checkingUsername?.length > 2 && (
+                        <p className="text-sm text-green-500">
+                          Username available!
+                        </p>
+                      )}
+                    {!checkingUsernameLoading && !isUsernameAvailable && (
+                      <p className="text-sm text-red-500">
+                        Username unavailable or already taken
+                      </p>
+                    )}
                   </div>
                   <input
                     id="username"
                     placeholder="Choose your username"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     {...register("username")}
-                    onChange={(e) => setValue("username", e.target.value.toLowerCase())}
+                    onChange={(e) =>
+                      setValue("username", e.target.value.toLowerCase())
+                    }
                   />
                   {errors.username && (
                     <p className="text-sm text-red-500">
@@ -245,7 +267,10 @@ export default function OnboardingForm() {
             {step === 2 && (
               <div className="space-y-2">
                 <div className="space-y-2">
-                  <label htmlFor="profession" className="block text-sm font-medium">
+                  <label
+                    htmlFor="profession"
+                    className="block text-sm font-medium"
+                  >
                     What do you do?
                   </label>
                   <input
@@ -261,7 +286,10 @@ export default function OnboardingForm() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="headline" className="block text-sm font-medium">
+                  <label
+                    htmlFor="headline"
+                    className="block text-sm font-medium"
+                  >
                     Your headline
                   </label>
                   <div className="flex space-x-2">
@@ -288,7 +316,10 @@ export default function OnboardingForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="features" className="block text-sm font-medium">
+                  <label
+                    htmlFor="features"
+                    className="block text-sm font-medium"
+                  >
                     Your Features
                   </label>
                   <CustomTagsInput
@@ -423,7 +454,7 @@ export default function OnboardingForm() {
                       htmlFor={`projects.${index}.link`}
                       className="block text-sm font-medium"
                     >
-                Project Link
+                      Project Link
                     </label>
                     <input
                       id={`projects.${index}.link`}
@@ -450,8 +481,11 @@ export default function OnboardingForm() {
                       {...register(`projects.${index}.timeline` as const)}
                     />
 
-<div>
-                      <label htmlFor={`projects.${index}.coverImage`} className="block text-sm font-medium">
+                    <div>
+                      <label
+                        htmlFor={`projects.${index}.coverImage`}
+                        className="block text-sm font-medium"
+                      >
                         Cover Image
                       </label>
                       <input
@@ -466,8 +500,12 @@ export default function OnboardingForm() {
                           {errors.projects[index].coverImage.message}
                         </p>
                       )}
+                      {uploadProgress > 0 && (
+                        <p className="text-sm text-blue-500">
+                          Uploading... {uploadProgress}%
+                        </p>
+                      )}
                     </div>
-                    
 
                     {errors.projects?.[index]?.timeline && (
                       <p className="text-sm text-red-500">
@@ -518,7 +556,7 @@ export default function OnboardingForm() {
                   "behance",
                   "figma",
                   "awwwards",
-                  "dribbble"
+                  "dribbble",
                 ].map((platform: string) => (
                   <div key={platform} className="space-y-2">
                     <span className="flex items-center">
@@ -547,34 +585,33 @@ export default function OnboardingForm() {
                       ) : null}
                       {platform.charAt(0).toUpperCase() + platform.slice(1)}
                     </span>
-                    {(
+                    {
                       <input
                         type="url"
                         className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder={`Enter your ${platform} link`}
                         {...register(`socialMedia.${platform}`)}
                       />
-                    )}
+                    }
                   </div>
                 ))}
               </div>
             )}
 
-
             <div className="flex justify-between">
-            {step === 5 ? (
-  <PrimaryButton
-    title={isLoading ? "Creating Profile..." : "Create Profile"}
-    type="submit"
-    disabled={isLoading}
-  />
-) : (
-  <PrimaryButton
-    title="Next Step"
-    onClick={handleNext}
-    icon={<FaChevronRight className="mr-1" />}
-  />
-)}
+              {step === 5 ? (
+                <PrimaryButton
+                  title={isLoading ? "Creating Profile..." : "Create Profile"}
+                  type="submit"
+                  disabled={isLoading}
+                />
+              ) : (
+                <PrimaryButton
+                  title="Next Step"
+                  onClick={handleNext}
+                  icon={<FaChevronRight className="mr-1" />}
+                />
+              )}
             </div>
           </form>
         </div>
