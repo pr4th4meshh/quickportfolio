@@ -8,6 +8,9 @@ import PrimaryButton from "@/components/ui/primary-button"
 import EditButton from "./EditButton"
 import { RiDoubleQuotesL } from "react-icons/ri"
 import "react-loading-skeleton/dist/skeleton.css"
+import InputField from "./portfolioHero/InputField"
+import TextAreaField from "./portfolioHero/TextAreaField"
+import ThemeSelect from "./portfolioHero/ThemeSelect"
 
 interface IUser {
   image: string
@@ -199,75 +202,11 @@ const PortfolioHero = ({ profileData }: IProfileData) => {
         <div className="w-full sm:w-2/3 space-y-6">
           {isEditing ? (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="fullName"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="profession"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Profession
-                </label>
-                <input
-                  type="text"
-                  id="profession"
-                  value={profession}
-                  onChange={(e) => setProfession(e.target.value)}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="headline"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Headline
-                </label>
-                <textarea
-                  id="headline"
-                  value={headline}
-                  onChange={(e) => setHeadline(e.target.value)}
-                  rows={3}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary resize-none"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="theme"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Theme
-                </label>
-                <select
-                  id="theme"
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value)}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary"
-                >
-                  <option value="modern">Modern</option>
-                  <option value="creative">Creative</option>
-                  <option value="professional">Professional</option>
-                  <option value="bold">Bold</option>
-                </select>
-              </div>
-              <PrimaryButton
-                title="Save Changes"
-                type="submit"
-                className="w-full"
-              />
+               <InputField id="fullName" label="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <InputField id="profession" label="Profession" value={profession} onChange={(e) => setProfession(e.target.value)} />
+              <TextAreaField id="headline" label="Headline" value={headline} onChange={(e) => setHeadline(e.target.value)} />
+              <ThemeSelect value={theme} onChange={(e) => setTheme(e.target.value)} />
+              <PrimaryButton title="Save Changes" type="submit" className="w-full" />
             </form>
           ) : (
             <div className="space-y-6 flex flex-col sm:justify-normal justify-center sm:items-start items-center">
