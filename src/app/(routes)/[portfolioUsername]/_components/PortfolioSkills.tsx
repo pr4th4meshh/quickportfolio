@@ -3,6 +3,8 @@ import { useSession } from "next-auth/react"
 import { useParams } from "next/navigation"
 import PrimaryButton from "@/components/ui/primary-button"
 import EditButton from "./EditButton"
+import SkillInput from "./portfolioSkills/SkillsInput"
+import SkillItem from "./portfolioSkills/SkillsItem"
 
 const PortfolioSkills = ({ skillsAndFeatures }: any) => {
   const [isEditing, setIsEditing] = useState(false)
@@ -54,34 +56,11 @@ const PortfolioSkills = ({ skillsAndFeatures }: any) => {
       <div className="container mx-auto px-4 py-20">
       {isEditing ? (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={newSkill}
-              onChange={(e) => setNewSkill(e.target.value)}
-              placeholder="Add a new skill"
-              className="flex-grow p-2 border border-gray-300 rounded-md"
-            />
-            <button
-              type="button"
-              onClick={handleAddSkill}
-              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
-            >
-              Add
-            </button>
-          </div>
+          <SkillInput newSkill={newSkill} setNewSkill={setNewSkill} handleAddSkill={handleAddSkill} />
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {skills.map((skill: string, index: number) => (
-              <div key={index} className="flex items-center justify-between p-2 dark:bg-black bg-white dark:text-white text-black dark:border-white border-black border rounded-md">
-                <span>{skill}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSkill(index)}
-                  className="text-red-500 hover:text-red-700 text-xl"
-                >
-                  &times;
-                </button>
-              </div>
+
+              <SkillItem key={index} skill={skill} index={index} handleRemoveSkill={handleRemoveSkill} />
             ))}
           </div>
           <div className="flex justify-end space-x-2">
