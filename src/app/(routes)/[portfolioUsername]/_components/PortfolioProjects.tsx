@@ -1,20 +1,13 @@
 import React, { useState } from "react"
-import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { useParams } from "next/navigation"
-import { FaClock, FaPlus, FaTrash } from "react-icons/fa"
-import {
-  Card,
-  CardTitle,
-  CardDescription,
-  CardActions,
-  ProjectLink,
-} from "@/components/ui/projectsCard"
-import ProjectThumbnail from "../../../../../public/project_thumbnail.jpg"
+import { FaPlus } from "react-icons/fa"
 import PrimaryButton from "@/components/ui/primary-button"
 import EditButton from "./EditButton"
 import { storage } from "@/lib/firebase"
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage"
+import ProjectCard from "./ProjectCard"
+import ProjectForm from "./ProjectForm"
 
 interface IProject {
   id?: string
@@ -34,7 +27,7 @@ const PortfolioProjects = ({
   const [projects, setProjects] = useState<IProject[]>(initialProjects.projects)
   const [imagePreviews, setImagePreviews] = useState<(string | null)[]>(
     new Array(initialProjects.projects.length).fill(null)
-  );
+  )
   const [uploading, setUploading] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [imageUploaded, setImageUploaded] = useState(false)
@@ -64,18 +57,21 @@ const PortfolioProjects = ({
 
   const handleRemoveProject = (index: number) => {
     setProjects(projects.filter((_, i) => i !== index))
-    setImagePreviews(imagePreviews.filter((_, i) => i !== index));
+    setImagePreviews(imagePreviews.filter((_, i) => i !== index))
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
     const file = e.target.files ? e.target.files[0] : null
     if (file) {
       // Preview the selected image
       const reader = new FileReader()
       reader.onloadend = () => {
-        const updatedPreviews = [...imagePreviews];
-        updatedPreviews[index] = reader.result as string; // Set preview for the specific project
-        setImagePreviews(updatedPreviews);
+        const updatedPreviews = [...imagePreviews]
+        updatedPreviews[index] = reader.result as string // Set preview for the specific project
+        setImagePreviews(updatedPreviews)
         setSelectedFile(file)
       }
       reader.readAsDataURL(file)
@@ -150,125 +146,19 @@ const PortfolioProjects = ({
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-6">
             {projects.map((project, index) => (
-              <div
-                key={index}
-                className="border border-gray-300 rounded-lg p-4 space-y-4"
-              >
-                <div>
-                  <label
-                    htmlFor={`title-${index}`}
-                    className="block text-sm font-medium py-1"
-                  >
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    id={`title-${index}`}
-                    value={project.title}
-                    onChange={(e) =>
-                      handleInputChange(index, "title", e.target.value)
-                    }
-                    className="flex-grow w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor={`description-${index}`}
-                    className="block text-sm font-medium py-1"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    id={`description-${index}`}
-                    value={project.description}
-                    onChange={(e) =>
-                      handleInputChange(index, "description", e.target.value)
-                    }
-                    rows={3}
-                    className="flex-grow p-2 border border-gray-300 rounded-md w-full"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor={`link-${index}`}
-                    className="block text-sm font-medium py-1"
-                  >
-                    Link
-                  </label>
-                  <input
-                    type="url"
-                    id={`link-${index}`}
-                    value={project.link}
-                    onChange={(e) =>
-                      handleInputChange(index, "link", e.target.value)
-                    }
-                    className="flex-grow p-2 border border-gray-300 rounded-md w-full"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor={`timeline-${index}`}
-                    className="block text-sm font-medium py-1"
-                  >
-                    Timeline
-                  </label>
-                  <input
-                    type="date"
-                    id={`timeline-${index}`}
-                    value={project.timeline}
-                    onChange={(e) =>
-                      handleInputChange(index, "timeline", e.target.value)
-                    }
-                    className="flex-grow p-2 border border-gray-300 rounded-md w-full"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor={`image-${index}`} className="block text-sm font-medium py-1">
-                    Project Image
-                  </label>
-                  <input
-                    type="file"
-                    id={`image-${index}`}
-                    accept="image/*"
-                    onChange={(e) => handleImageChange(e, index)}
-                    className="block w-full p-2 border border-gray-300 rounded-md"
-                  />
-                  {imagePreviews[index] && (
-                    <div className="mt-4">
-                      <Image
-                        src={imagePreviews[index]!}
-                        alt="Image Preview"
-                        className="h-32 w-32 object-cover border rounded-xl dark:border-white border-black"
-                        height={100}
-                        width={100}
-                      />
-                    </div>
-                  )}
-                  {uploading && <p>Uploading... {uploadProgress}%</p>}
-                  {imageUploaded && <p className="text-blue-400 mt-2">Image uploaded successfully! Click Save changes to apply the changes.</p>}
-                  {!uploading && imagePreviews[index] && (
-                    <button
-                      type="button"
-                      // disabled={!selectedFile || imageUploaded}
-                      onClick={() => handleUploadImage(index)}
-                      className="mt-2 inline-flex items-center disabled:opacity-80 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                    >
-                      Upload Image
-                    </button>
-                  )}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleRemoveProject(index)}
-                  className="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                >
-                  <FaTrash className="mr-2" /> Remove Project
-                </button>
+              <div key={index}>
+                <ProjectForm
+                  project={project}
+                  index={index}
+                  handleInputChange={handleInputChange}
+                  handleImageChange={handleImageChange}
+                  handleUploadImage={handleUploadImage}
+                  handleRemoveProject={handleRemoveProject}
+                  imagePreviews={imagePreviews}
+                  uploading={uploading}
+                  uploadProgress={uploadProgress}
+                  imageUploaded={imageUploaded}
+                />
               </div>
             ))}
             <div className="flex justify-between">
@@ -293,29 +183,13 @@ const PortfolioProjects = ({
           <div className="relative">
             <div
               className={`${
-                isAGrid ? "grid grid-cols-1 sm:grid-cols-3 gap-4" : "flex flex-col space-y-4"
+                isAGrid
+                  ? "grid grid-cols-1 sm:grid-cols-3 gap-4"
+                  : "flex flex-col space-y-4"
               }`}
             >
-              {projects.map((project: IProject, index: number) => (
-                <Card key={index}>
-                  <Image
-                    src={project.coverImage || ProjectThumbnail}
-                    alt={project.title}
-                    width={200}
-                    height={200}
-                    className="border-2 border-background h-[250px] w-full object-cover"
-                    quality={100}
-                  />
-                  <CardTitle>{project.title}</CardTitle>
-                  <CardDescription>{project.description}</CardDescription>
-                  <CardDescription className="flex flex-row items-center">
-                    <FaClock className="mr-2" />
-                    {new Date(project.timeline).toDateString()}
-                  </CardDescription>
-                  <CardActions>
-                    <ProjectLink link={project.link} />
-                  </CardActions>
-                </Card>
+              {projects.map((project: IProject) => (
+                <ProjectCard key={project.id} project={project} />
               ))}
             </div>
             {session?.user?.id === initialProjects.userId && (

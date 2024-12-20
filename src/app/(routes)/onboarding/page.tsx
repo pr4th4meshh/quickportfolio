@@ -38,7 +38,7 @@ export default function OnboardingForm() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(true)
   const [checkingUsernameLoading, setCheckingUsernameLoading] = useState(false)
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
+  const [, setCoverImageUrl] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   let progress = 0
 
