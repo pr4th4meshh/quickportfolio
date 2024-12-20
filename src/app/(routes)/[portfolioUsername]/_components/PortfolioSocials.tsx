@@ -1,23 +1,12 @@
-import Link from "next/link"
 import React, { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useParams } from "next/navigation"
-import {
-  FaTwitter,
-  FaDribbble,
-  FaGithub,
-  FaInstagram,
-  FaYoutube,
-  FaMedium,
-  FaGlobe,
-  FaLinkedin,
-  FaBehance,
-  FaFigma,
-} from "react-icons/fa6"
-import { FaExternalLinkAlt, FaProjectDiagram } from "react-icons/fa"
+import { FaExternalLinkAlt } from "react-icons/fa"
 import PrimaryButton from "@/components/ui/primary-button"
 import EditButton from "./EditButton"
-import { GlareCard } from "@/components/ui/glare-card"
+import SocialMediaInput from "./portfolioSocials/SocialMediaInput"
+import SocialMediaCard from "./portfolioSocials/SocialMediaCard"
+import { socialIcons } from "./portfolioSocials/SocialMediaIcons"
 
 const PortfolioSocials = ({ socialMediaLinksViaPortfolio }: any) => {
   const [isEditing, setIsEditing] = useState(false)
@@ -64,20 +53,6 @@ const PortfolioSocials = ({ socialMediaLinksViaPortfolio }: any) => {
     ([platform, url]) => url !== null && url !== undefined && url !== ""
   )
 
-  const socialIcons = {
-    twitter: FaTwitter,
-    dribbble: FaDribbble,
-    github: FaGithub,
-    instagram: FaInstagram,
-    youtube: FaYoutube,
-    medium: FaMedium,
-    website: FaGlobe,
-    linkedin: FaLinkedin,
-    behance: FaBehance,
-    figma: FaFigma,
-    awwwards: FaProjectDiagram,
-  }
-
   return (
     socialMediaArray.length > 0 && (
       <div className="py-20 container mx-auto px-4">
@@ -86,22 +61,12 @@ const PortfolioSocials = ({ socialMediaLinksViaPortfolio }: any) => {
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-6">
             {Object.keys(socialMediaLinks).map((platform) => (
-              <div key={platform} className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-4 sm:space-y-0">
-                <label
-                  htmlFor={platform}
-                  className="w-24 text-right capitalize"
-                >
-                  {platform}:
-                </label>
-                <input
-                  type="url"
-                  id={platform}
-                  value={socialMediaLinks[platform] || ""}
-                  onChange={(e) => handleInputChange(platform, e.target.value)}
-                  placeholder={`Enter ${platform} URL`}
-                  className="flex-grow p-2 border border-gray-300 rounded-md"
-                />
-              </div>
+              <SocialMediaInput
+                key={platform}
+                platform={platform}
+                value={socialMediaLinks[platform] || ""}
+                handleInputChange={handleInputChange}
+              />
             ))}
             <div className="flex justify-end space-x-4 mt-4">
               <PrimaryButton
@@ -116,20 +81,17 @@ const PortfolioSocials = ({ socialMediaLinksViaPortfolio }: any) => {
           <div>
             <div className="grid sm:grid-cols-5 grid-cols-3 gap-6 sm:gap-4">
               {socialMediaArray.length > 0 &&
-                socialMediaArray.map(([platform, url]: any, index) => (
-                  <div key={index} className="flex justify-center">
-                    <Link href={url} target="_blank" rel="noopener noreferrer">
-                      <GlareCard className="flex flex-col justify-center items-center dark:bg-black-900 bg-black-500">
-                        <span className="flex items-center justify-center dark:text-white text-black">
-                          {React.createElement(
-                            socialIcons[platform] || FaExternalLinkAlt,
-                            { className: "text-3xl sm:text-5xl" }
-                          )}
-                        </span>
-                      </GlareCard>
-                    </Link>
-                  </div>
-                ))}
+                socialMediaArray.map(([platform, url]: any, index) => {
+                  const Icon = socialIcons[platform] || FaExternalLinkAlt
+                  return (
+                    <SocialMediaCard
+                      key={index}
+                      platform={platform}
+                      url={url}
+                      icon={Icon}
+                    />
+                  )
+                })}
             </div>
             {session?.user?.id === socialMediaLinksViaPortfolio.userId && (
               <EditButton
